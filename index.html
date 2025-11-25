@@ -8,7 +8,7 @@
 <!-- Thêm thư viện Model Viewer để xem 3D -->
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 <!-- Thêm thư viện jsQR để quét mã QR -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.1.0/dist/jsQR.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsQR@1.1.0/dist/jsQR.min.js"></script>
 <style>
 /* --- 1. BIẾN VÀ THIẾT LẬP CHUNG (MÀU MỚI: XANH LÁ CÂY & VÀNG) --- */
 :root {
@@ -333,7 +333,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
 
 #qr-result { border-left: 5px solid var(--primary-color); background: var(--nav-active-bg); }
 
-/* Video Player Style */
+/* Video Player Style - CONTAINER này không còn dùng để phát video nữa, chỉ để giữ cấu trúc */
 #video-container {
     width: 100%;
     margin-top: 10px;
@@ -343,10 +343,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
-#artifact-video {
-    width: 100%;
-    display: block;
-}
+/* Xóa style cho #artifact-video vì đã loại bỏ thẻ <video> */
 
 /* 3D Viewer Container */
 #artifact-360-display {
@@ -471,7 +468,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
       </div>
 
       <div class="chat-window" id="chat-window" style="flex-grow: 1; width: 95%; max-height: 440px; overflow-y: auto; padding: 10px; margin-bottom: 5px; border-radius: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); text-align: left;">
-        <div class='chat-message ai-msg'>🤖 Xin chào! Tôi đang ở chế độ **mô phỏng**. Hãy thử các câu hỏi mẫu về Trần Hưng Đạo ở trên để xem phản hồi được lập trình sẵn!</div>
+        <div class='chat-message ai-msg'>🤖 Xin chào! Tôi đang ở chế độ **mô phỏng**. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi mặc định!</div>
       </div>
       
       <div id="loader" style="display:none; margin-top: 10px;"></div>
@@ -500,9 +497,9 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
         <button id="stop-button" onclick="stopCamera()" style="display: none; flex: 1; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">Ngừng Camera</button>
       </div>
 
-      <!-- Nút giả lập (MOCK SCAN BUTTON) -->
-      <button onclick="mockScan()" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); width: 95%; margin-top: 10px; padding: 10px 25px; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">
-          ✨ Giả lập Quét thành công
+      <!-- Xóa nút mockScanAlternate cũ và giữ lại mockScanArtifact1 -->
+      <button onclick="mockScanArtifact1()" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); width: 95%; margin-top: 10px; padding: 10px 25px; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">
+          ⚡ Xem Hiện vật mẫu: Tượng Trần Hưng Đạo
       </button>
 
       <!-- Kết quả Quét -->
@@ -511,17 +508,14 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
         <div id="scanned-details" style="font-size: 14px; margin-bottom: 10px;"></div>
         
         <div id="interaction-buttons" style="display: flex; justify-content: center; width: 100%; margin-top: 5px; gap: 10px;">
-          <button id="audio-button" onclick="playVideoPresentation()" style="display: none; flex: 1; padding: 10px 15px; border-radius: 10px; font-size: 14px;">🎥 Xem thuyết trình</button>
+          <!-- Đã đổi id để dễ dàng phân biệt, giờ là youtube-button -->
+          <button id="youtube-button" onclick="playVideoPresentation()" style="display: none; flex: 1; padding: 10px 15px; border-radius: 10px; font-size: 14px;">▶️ Xem thuyết trình</button>
           <button id="view360-button" onclick="view360()" style="display: none; flex: 1; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); padding: 10px 15px; border-radius: 10px; font-size: 14px;">🌀 Xem 360° / AR</button>
         </div>
         
-        <!-- VIDEO PLAYER CONTAINER -->
-        <div id="video-container">
-            <video id="artifact-video" controls>
-                <source src="Cuộc đời Hưng Đạo Đại Vương Trần Quốc Tuấn  Nhân vật lịch sử - Tóm tắt lịch sử - EZ Sử - EZ Sử (1080p, h264).mp4" type="video/mp4">
-                Trình duyệt của bạn không hỗ trợ video.
-            </video>
-            <div style="padding: 5px; background: #333; color: #fff; font-size: 12px; text-align: center;">Đang phát video thuyết minh</div>
+        <!-- VIDEO PLAYER CONTAINER: Loại bỏ video player cũ -->
+        <div id="video-container" style="display:none;">
+            <!-- Phần tử <video> đã bị xóa -->
         </div>
 
         <!-- 3D VIEWER CONTAINER -->
@@ -1012,8 +1006,11 @@ async function sendMessage() {
    ========================================================================== */
 let currentStream = null;
 let videoInterval = null;
-// Dữ liệu mẫu giả định QR quét thành công (Dữ liệu này được update trong mockScan)
-const mockArtifactData = JSON.stringify({ id: "artifact_123", type: "artifact", name: "Tượng Trần Hưng Đạo", floor: 1, pos: "Cổ vật", model: "tuong+tran+hung+dao.glb" });
+// Dữ liệu mẫu giả định QR quét thành công (ĐÃ CẬP NHẬT: Thêm youtubeUrl)
+const mockArtifactData = { id: "artifact_123", type: "artifact", name: "Tượng Trần Hưng Đạo", floor: 1, pos: "Cổ vật", model: "tuong+tran+hung+dao.glb", youtubeUrl: "https://youtu.be/G18c1CZdyFk?si=8mQuffOJWBNzAVC" }; // URL YouTube mới
+const mockArtifactData2 = { id: "artifact_456", type: "artifact", name: "Đài thờ Trà Kiệu", floor: 3, pos: "Văn hóa", model: "dai+tho+tra+kieu.glb", youtubeUrl: "https://youtu.be/G18c1CZdyFk?si=8mQuffOJWBNzAVC" }; 
+
+let currentArtifactData = null; // Biến lưu dữ liệu hiện vật đang hiển thị
 let selectedDestinationMarkerId = null;
 
 function showAlert(message) { console.log("[Thông báo]: " + message); }
@@ -1116,77 +1113,63 @@ function stopCamera() {
   document.getElementById('scanner-line-wrapper').classList.add('hidden');
 }
 
-// Hàm giả lập quét QR (ĐÃ CẬP NHẬT LOGIC LƯU HIỆN VẬT)
-function mockScan() {
+// --- NEW FUNCTION: Mô phỏng chỉ cho hiện vật Trần Hưng Đạo (artifact_123) ---
+function mockScanArtifact1() {
     stopCamera();
+    const scanData = mockArtifactData; // Lấy dữ liệu Trần Hưng Đạo
     
-    // Giả lập 2 hiện vật distinct để test unlock quiz
-    const artifactId1 = 'artifact_123';
-    const artifactName1 = 'Tượng Trần Hưng Đạo';
-    const artifactId2 = 'artifact_456';
-    const artifactName2 = 'Đài thờ Trà Kiệu';
-    
-    let scanId = artifactId1;
-    let scanName = artifactName1;
-
-    // Logic mô phỏng: Nếu đã quét hiện vật 1, chuyển sang quét hiện vật 2
-    if (visitedArtifacts.find(a => a.id === artifactId1) && !visitedArtifacts.find(a => a.id === artifactId2)) {
-        scanId = artifactId2;
-        scanName = artifactName2;
-    } else if (visitedArtifacts.find(a => a.id === artifactId1) && visitedArtifacts.find(a => a.id === artifactId2)) {
-        // Nếu đã quét đủ 2 hiện vật, quay lại quét hiện vật 1
-        scanId = artifactId1;
-        scanName = artifactName1;
-    }
-
-    const existing = visitedArtifacts.find(a => a.id === scanId);
+    const existing = visitedArtifacts.find(a => a.id === scanData.id);
     if (!existing) {
-        visitedArtifacts.push({ id: scanId, name: scanName });
-        showAlert(`Giả lập: Quét thành công hiện vật: ${scanName}. Đã thêm vào Hồ sơ.`);
+        visitedArtifacts.push({ id: scanData.id, name: scanData.name });
+        showAlert(`Mô phỏng: Quét thành công hiện vật: ${scanData.name}. Đã thêm vào Hồ sơ.`);
     } else {
-        showAlert(`Giả lập: Quét lại hiện vật: ${scanName}. (Đã có trong Hồ sơ).`);
+        showAlert(`Mô phỏng: Quét lại hiện vật: ${scanData.name}. (Đã có trong Hồ sơ).`);
     }
 
-    // Cập nhật mockArtifactData cho UI (QR Result)
-    const mockArtifactDataUpdated = JSON.stringify({ id: scanId, type: "artifact", name: scanName, floor: scanId === artifactId1 ? 1 : 3, pos: "Cổ vật" });
-
-
-    handleScanSuccess(mockArtifactDataUpdated); // Cập nhật QR result UI
+    // Gán dữ liệu hiện vật đang hiển thị và cập nhật UI
+    currentArtifactData = scanData; 
+    handleScanSuccess(JSON.stringify(scanData)); 
+    
+    // Đảm bảo nút điều khiển camera được reset (chỉ hiện nút quét lại/mô phỏng)
     document.getElementById('scan-button').innerText = 'Quét lại';
     document.getElementById('scan-button').style.display = 'inline-block';
-
-    // Cần cập nhật profile nếu đang ở tab profile
-    if (document.getElementById('profile-tab').classList.contains('active-tab')) {
-        renderProfileMain(); // Update main view score/reward status
-        renderProfileHistoryQuiz(); // Update history/quiz view
-    }
 }
 
+
+// XÓA HÀM mockScanAlternate (Logic luân phiên không cần thiết và gây nhầm lẫn)
 
 function handleScanSuccess(json) {
   try {
       const data = JSON.parse(json);
+      currentArtifactData = data; // Lưu dữ liệu quét vào biến toàn cục
+      
       const titleEl = document.getElementById('data-title');
       const detailsEl = document.getElementById('scanned-details');
-      const audioBtn = document.getElementById('audio-button');
+      const youtubeBtn = document.getElementById('youtube-button');
       const view360Btn = document.getElementById('view360-button');
       
-      // Reset interaction buttons
-      audioBtn.style.display = 'none'; view360Btn.style.display = 'none';
+      // Reset interaction buttons & viewers
+      youtubeBtn.style.display = 'none'; view360Btn.style.display = 'none';
       document.getElementById('artifact-360-display').style.display = 'none';
       document.getElementById('video-container').style.display = 'none'; 
-
+      
       if (data.type === 'artifact' && data.name) {
+        // Đây là hiện vật -> HIỂN THỊ THÔNG TIN
         titleEl.innerText = `Thông tin hiện vật: ${data.name}`;
         detailsEl.innerHTML = `<p><b>ID:</b> ${data.id}</p><p><b>Vị trí:</b> Tầng ${data.floor} - Khu ${data.pos}</p>`;
         
-        // Giả lập hiện vật có cả Video và 3D
+        // Hiện nút YouTube nếu có URL
+        if (data.youtubeUrl) {
+            youtubeBtn.style.display = 'inline-block';
+        }
+
+        // Hiện nút 360/AR nếu có model (Mô phỏng: artifact_123 và artifact_456 đều có)
         if (data.id === 'artifact_123' || data.id === 'artifact_456') {
-            audioBtn.style.display = 'inline-block';
             view360Btn.style.display = 'inline-block';
         }
         showAlert(`Quét thành công: ${data.name}`);
       } else {
+        // KHÔNG PHẢI HIỆN VẬT -> HIỂN THỊ THÔNG BÁO LỖI/CHUNG
         titleEl.innerText = "Kết quả quét";
         detailsEl.innerText = "Dữ liệu không phải là hiện vật (Ví dụ: Mã vé đã được xử lý lúc Đăng nhập).";
       }
@@ -1206,41 +1189,40 @@ function handleScanSuccess(json) {
   }
 }
 
-// --- NEW VIDEO FEATURE ---
+// --- NEW VIDEO FEATURE (ĐÃ CẬP NHẬT để mở YouTube link) ---
 function playVideoPresentation() {
-    const videoContainer = document.getElementById('video-container');
-    const videoEl = document.getElementById('artifact-video');
-    const display360 = document.getElementById('artifact-360-display');
+    if (currentArtifactData && currentArtifactData.youtubeUrl) {
+        // Tắt 3D viewer nếu đang mở
+        document.getElementById('artifact-360-display').style.display = 'none';
 
-    display360.style.display = 'none';
-    
-    videoContainer.style.display = 'block';
-    videoEl.play();
-    
-    showAlert("Đang phát video thuyết minh.");
+        // Mở URL YouTube trong tab mới
+        window.open(currentArtifactData.youtubeUrl, '_blank');
+        showAlert(`Đang mở video thuyết minh trên YouTube: ${currentArtifactData.youtubeUrl}`);
+    } else {
+        showAlert("Lỗi: Không tìm thấy liên kết YouTube.");
+    }
 }
 
 // --- 3D VIEWER FEATURE (UPDATED) ---
 function view360() { 
     const d = document.getElementById('artifact-360-display');
-    const videoContainer = document.getElementById('video-container');
-    const videoEl = document.getElementById('artifact-video');
     
-    videoContainer.style.display = 'none';
-    videoEl.pause();
+    // TẮT VIDEO CONTAINER ĐỂ ĐẢM BẢO CHỈ 1 VIEW MỞ MỖI LẦN
+    document.getElementById('video-container').style.display = 'none';
 
     d.style.display = 'block';
     
     // Đã thay đổi từ Horse.glb sang Astronaut.glb để mô phỏng hình người
     const modelSrc = 'https://modelviewer.dev/shared-assets/models/Astronaut.glb'; 
-    const iosSrc = 'tuong+tran+hung+dao.usdz';
+    // Dữ liệu mock: Tên hiện vật hiện tại
+    const artifactName = currentArtifactData ? currentArtifactData.name : 'Hiện vật Lịch sử';
     
     d.innerHTML = `
       <model-viewer 
         src="${modelSrc}" 
-        ios-src="${iosSrc}"
-        poster="https://placehold.co/400x300/eafaea/000000?text=Mo+Hinh+TƯỢNG+TRẦN+HƯNG+ĐẠO+3D+(GLB)" 
-        alt="Mô hình 3D Tượng Trần Hưng Đạo"
+        ios-src="tuong+tran+hung+dao.usdz"
+        poster="https://placehold.co/400x300/eafaea/000000?text=Mo+Hinh+3D+${artifactName.toUpperCase()}" 
+        alt="Mô hình 3D ${artifactName}"
         shadow-intensity="1"
         camera-controls
         auto-rotate
@@ -1253,7 +1235,7 @@ function view360() {
       </model-viewer>
     `;
     
-    showAlert("Đã tải khung nhìn 3D/AR Tượng Trần Hưng Đạo.");
+    showAlert(`Đã tải khung nhìn 3D/AR ${artifactName}.`);
 }
 
 /* ==========================================================================
