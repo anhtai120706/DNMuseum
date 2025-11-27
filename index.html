@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bảo tàng Đà Nẵng – Ứng dụng Thông minh</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Đã đổi sang Noto Sans cho chữ đẹp và hỗ trợ tiếng Việt tốt hơn -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Thêm thư viện Model Viewer để xem 3D -->
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 <!-- Thêm thư viện jsQR để quét mã QR -->
 <script src="https://cdn.jsdelivr.net/npm/jsQR@1.1.0/dist/jsQR.min.js"></script>
 <style>
-/* --- 1. BIẾN VÀ THIẾT LẬP CHUNG (MÀU MỚI: XANH LÁ CÂY & VÀNG) --- */
+/* --- 1. BIẾN VÀ THIẾT LẬP CHUNG --- */
 :root {
   --primary-color: #2ecc71; /* Fresh Green */
   --primary-dark: #27ae60; /* Darker Green */
@@ -23,32 +24,35 @@
 
 body {
   background: var(--bg-light);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  /* Đã thay đổi: Dùng full viewport, sử dụng Grid để quản lý Screens */
+  height: 100vh; /* Chiếm full chiều cao viewport */
+  width: 100vw; /* Chiếm full chiều rộng viewport */
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  padding: 0;
+  display: grid; /* Sử dụng grid để các screens xếp chồng lên nhau */
+  place-items: stretch; /* Đảm bảo các screens con căng ra */
+  position: relative; /* Cho phép định vị tuyệt đối cho lang-icon */
+  /* Đã cập nhật Font chính */
+  font-family: 'Noto Sans', sans-serif; 
 }
 
+/* KHUNG ẢO (PHONE) ĐÃ BỊ LOẠI BỎ */
 .phone {
-  position: relative;
-  width: 390px;
-  height: 780px;
-  border: 8px solid var(--text-dark);
-  border-radius: 48px;
-  background: #000;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    /* Loại bỏ lớp phone, các nội dung con được kéo lên body */
+    display: contents; 
 }
 
 .screen {
   background: var(--bg-light);
   width: 100%;
   height: 100%;
-  border-radius: 40px; 
+  /* Thay đổi: Loại bỏ border-radius cố định của khung điện thoại */
+  border-radius: 0; 
+  
+  /* Cần đặt grid-area để mỗi màn hình chiếm cùng 1 vị trí (stacking) */
+  grid-area: 1 / 1;
+  
+  /* Giữ lại các thuộc tính layout bên trong */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,7 +80,7 @@ h3 {
   text-align: center;
 }
 h4 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--primary-dark); }
-p { font-size: 14px; color: #555; margin-bottom: 5px; text-align: justify; line-height: 1.4; }
+p { font-size: 14px; color: #555; margin-bottom: 5px; text-align: justify; line-height: 1.5; }
 ul { padding-left: 20px; text-align: left; }
 
 /* --- 2. NÚT VÀ INPUT --- */
@@ -91,7 +95,7 @@ button {
   cursor: pointer;
   transition: 0.3s ease;
   font-weight: 600;
-  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3); /* Shadow mới */
+  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3); 
 }
 button:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4); }
 button:active { transform: translateY(0); box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); }
@@ -116,7 +120,8 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
   align-items: center;
   background: var(--bg-card);
   padding: 10px 0;
-  border-radius: 0 0 40px 40px; 
+  /* Thay đổi: Loại bỏ border-radius cố định dưới cùng của khung điện thoại */
+  border-radius: 0; 
   width: 100%;
   box-shadow: 0 -5px 20px rgba(0,0,0,0.1); 
   border-top: 1px solid #eee;
@@ -212,7 +217,23 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
 }
 .quiz-option:hover { background: #eee; }
 .correct-answer { background: #c8e6c9 !important; border-color: #388e3c !important; color: #1b5e20 !important; font-weight: 600; }
-.incorrect-answer { background: #ffcdd2 !important; border-color: #d32f2f !important; color: #b71c1c !important; }
+.incorrect-answer { background: #ffcdd2 !important; border-color: #d32f2f !important; color: #b71c1c !important; font-weight: 600; } /* Đã thêm font-weight 600 */
+
+.quiz-result-message {
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-weight: 600;
+    text-align: center;
+}
+.quiz-success {
+    background-color: #d1e5d4;
+    color: #1b5e20;
+}
+.quiz-fail {
+    background-color: #ffcdd2;
+    color: #b71c1c;
+}
 
 
 .login-card {
@@ -414,10 +435,19 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
 .filter-item span { font-size: 20px; }
 
 /* Lang */
-#lang-icon { position: absolute; top: 35px; right: 35px; z-index: 100; cursor: pointer; background: white; padding: 6px 12px; border-radius: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.15); font-weight: 600; display: flex; align-items: center; }
-#lang-options { position: absolute; top: 70px; right: 35px; display: none; flex-direction: column; z-index: 101; background: white; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); padding: 5px; min-width: 150px; }
-#lang-options button { margin: 0; padding: 8px 10px; width: 100%; text-align: left; background: none; color: #333; font-size: 14px; box-shadow: none; border-radius: 8px; }
-#lang-options button:hover { background: var(--nav-active-bg); color: var(--primary-dark); }
+/* Đã thay đổi: Dùng fixed position để nó không bị trôi và không phụ thuộc vào khung phone */
+#lang-icon { 
+    position: fixed; 
+    top: 20px; 
+    right: 20px; 
+    z-index: 100; cursor: pointer; background: white; padding: 6px 12px; border-radius: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.15); font-weight: 600; display: flex; align-items: center; 
+}
+#lang-options { 
+    position: fixed; 
+    top: 55px; 
+    right: 20px; 
+    display: none; flex-direction: column; z-index: 101; background: white; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); padding: 5px; min-width: 150px; 
+}
 
 /* NEW: Sub-Tab Navigation for Profile */
 .sub-nav {
@@ -480,10 +510,47 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
     background-color: #f0f0f0;
 }
 
+/* NEW: Style cho Quiz Standalone Screen */
+.quiz-standalone-content {
+    /* ĐÃ SỬA: Bỏ max-width để sử dụng hết 95% */
+    width: 95%;
+    /* ĐÃ SỬA: Đặt max-height để cuộn được */
+    max-height: 90%; 
+    overflow-y: auto;
+    padding: 15px; /* Giảm padding để tăng không gian hiển thị */
+    background: var(--bg-card);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    margin-top: 10px;
+    box-sizing: border-box; /* Quan trọng để padding không làm tăng width */
+}
+/* ĐÃ XÓA: CSS cho h4 của quiz-standalone-content vì thẻ h4 đã bị xóa */
+/*
+.quiz-standalone-content h4 { 
+    text-align: center; 
+    color: var(--primary-dark); 
+    font-size: 24px; 
+    font-weight: 700; 
+    border-bottom: 3px solid var(--accent-color);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+*/
+.quiz-standalone-content .quiz-question h4 {
+    /* Tiêu đề câu hỏi (1. Trần Hưng Đạo...) phải nằm trên và căn trái */
+    text-align: left;
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 8px;
+    width: 100%;
+    color: var(--primary-dark); /* Đổi màu để nổi bật hơn */
+    font-size: 18px; /* Tăng kích thước câu hỏi */
+}
 </style>
 </head>
 <body>
-<div class="phone">
+<!-- ĐÃ LOẠI BỎ KHUNG <div class="phone"> để ứng dụng chiếm toàn màn hình -->
 
   <!-- Language control -->
   <div id="lang-icon" onclick="toggleLangOptions()">
@@ -511,6 +578,24 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
       <input type="text" id="ticket-input" placeholder="Nhập mã vé...">
       <button onclick="goToMain()">Đăng nhập</button>
       <button onclick="goToMain()" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); box-shadow: 0 6px 20px rgba(243, 156, 18, 0.3);">📷 Quét mã QR</button>
+    </div>
+  </div>
+
+  <!-- QUIZ STANDALONE SCREEN (MÀN HÌNH QUIZ RIÊNG) -->
+  <div class="screen hidden" id="quiz-standalone-screen" style="justify-content: flex-start; padding-top: 20px;">
+    <button onclick="backToQrTab()" style="width: 95%; margin-bottom: 15px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); padding: 10px 25px;">
+        ⬅️ Quay lại Hiện vật
+    </button>
+    
+    <div class="quiz-standalone-content" id="quiz-section-standalone">
+        <!-- Nội dung Quiz sẽ được render vào đây bằng JS -->
+        <!-- ĐÃ XÓA: h4 id="quiz-title-standalone" -->
+        <div id="quiz-content-standalone">
+            <p id="quiz-initial-message-standalone" style="text-align: center; color: #7f8c8d;">Đang tải Quiz...</p>
+            <div id="quiz-question-container-standalone"></div>
+            <button id="quiz-submit-button-standalone" onclick="submitArtifactQuiz('standalone')" style="display:none; width:100%; margin-top: 15px; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">Hoàn thành Quiz</button>
+            <div id="quiz-feedback-standalone" class="quiz-result-message" style="display: none;"></div>
+        </div>
     </div>
   </div>
 
@@ -544,11 +629,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
         <button class="quick-q-btn" onclick="prefillAndSend('Tiểu sử Trần Hưng Đạo?')">Tiểu sử Trần Hưng Đạo?</button>
         <button class="quick-q-btn" onclick="prefillAndSend('Tác phẩm nổi tiếng nhất của Trần Hưng Đạo?')">Tác phẩm nổi tiếng nhất của ông?</button>
         <button class="quick-q-btn" onclick="prefillAndSend('Trận chiến Bạch Đằng diễn ra khi nào?')">Trận chiến Bạch Đằng diễn ra khi nào?</button>
-        <button class="quick-q-btn" onclick="prefillAndSend('Ý nghĩa câu nói "Bệ hạ chém đầu thần rồi hãy hàng"?')">Ý nghĩa câu nói nổi tiếng của ông?</button>
+        <button class="quick-q-btn" onclick="prefillAndSend('Ý nghĩa câu nói \"Bệ hạ chém đầu thần rồi hãy hàng\"?')">Ý nghĩa câu nói nổi tiếng của ông?</button>
       </div>
 
       <div class="chat-window" id="chat-window" style="flex-grow: 1; width: 95%; max-height: 440px; overflow-y: auto; padding: 10px; margin-bottom: 5px; border-radius: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); text-align: left;">
-        <div class='chat-message ai-msg'>🤖 Xin chào! Tôi đang ở chế độ **mô phỏng**. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi mặc định!</div>
+        <!-- Đã sửa: Xóa ký tự 🤖 và in đậm không cần thiết -->
+        <div class='chat-message ai-msg'>Xin chào! Tôi đang ở chế độ mô phỏng. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi được lập trình sẵn!</div>
       </div>
       
       <div id="loader" style="display:none; margin-top: 10px;"></div>
@@ -602,7 +688,17 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
         <div id="artifact-360-display">
             <p style="text-align:center; margin-top: 130px; color: #999;">Đang tải mô hình...</p>
         </div>
+        
+        <!-- NÚT BẮT ĐẦU QUIZ MỚI -->
+        <button id="start-quiz-button-qr" onclick="handleStartQuiz()" style="display:none; width: 100%; margin-top: 15px; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">
+            ❓ Bắt đầu Quiz Hiện vật
+        </button>
+        
       </div>
+      
+      <!-- NEW: Khu vực Quiz tại hiện vật (hiện trong QR tab) -->
+      <!-- ĐÃ XÓA SECTION NÀY VÀ CHUYỂN LOGIC SANG MÀN HÌNH RIÊNG #quiz-standalone-screen -->
+      
     </div>
 
     <!-- Map Tab (Nâng cấp) -->
@@ -638,7 +734,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
       <div id="ai-guide" style="background: linear-gradient(45deg, var(--primary-color), #4d89ff); color: white; padding: 12px; width: 95%; border-radius: 12px; font-size: 14px; margin-top: 15px;">🤖 Gợi ý: Tầng 1 đang đông khách.</div>
     </div>
 
-    <!-- Profile Tab (Nâng cấp) -->
+    <!-- Profile Tab (Đã cập nhật - Loại bỏ Quiz) -->
     <div class="tab-content" id="profile-tab">
       <h3>👤 Hồ sơ & Thành tích</h3>
       
@@ -658,7 +754,8 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
                  </button>
              </div>
              
-             <div id="profile-edit-mode" style="display:none; text-align: center;">
+             <!-- KHẮC PHỤC LỖI: Thêm onclick="event.stopPropagation()" vào đây để ngăn click vào input làm ẩn chế độ chỉnh sửa -->
+             <div id="profile-edit-mode" style="display:none; text-align: center;" onclick="event.stopPropagation()">
                  <h4 style="margin-top: 0;">Chỉnh sửa Hồ sơ</h4>
                  <label for="edit-username" style="font-size: 14px; display: block; margin-bottom: 5px;">Họ tên:</label>
                  <input type="text" id="edit-username" placeholder="Nhập tên mới" style="width: 80%; margin-bottom: 10px; padding: 8px;">
@@ -676,21 +773,21 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
 
           <!-- PHẦN THƯỞNG ĐƯỢC NÂNG CẤP -->
           <div class="info-card achievement-card" id="reward-card">
-            <h4>🏆 Thành tích Quizz & Phần thưởng</h4>
-            <p>Điểm Quiz: <b id="quiz-score">0</b>/3</p>
+            <h4>🏆 Thành tích Quiz & Phần thưởng</h4>
+            <p>Điểm Quiz Đúng: <b id="quiz-score">0</b>/<span id="quiz-total-score">0</span></p>
             <div id="reward-status-display">
                 <!-- Nội dung được cập nhật bằng JS -->
-                <p id="reward-status">Hoàn thành Quiz để nhận phần thưởng hấp dẫn!</p>
+                <p id="reward-status">Tích lũy điểm Quiz để nhận phần thưởng hấp dẫn!</p>
             </div>
           </div>
           
-          <!-- NEW: Button to trigger the History/Quiz sub-screen -->
+          <!-- NEW: Button to trigger the History sub-screen -->
           <button onclick="showHistoryQuizView()" style="width: 95%; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);">
-              🔍 Xem Lịch sử Hiện vật & Quiz
+              🔍 Xem Lịch sử Quét
           </button>
       </div>
       
-      <!-- NEW: Artifact History and Quiz Sub-View (Initially hidden) -->
+      <!-- NEW: Artifact History Sub-View (Loại bỏ Quiz) -->
       <div id="artifact-history-quiz-view" style="width: 100%; display: none; flex-direction: column; align-items: center;">
           
           <!-- Back button -->
@@ -698,11 +795,9 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
               ⬅️ Quay lại Hồ sơ
           </button>
           
-          <!-- SUB-NAVIGATION BAR (MỚI) -->
+          <!-- SUB-NAVIGATION BAR (Chỉ còn Lịch sử) -->
           <div class="sub-nav">
               <div class="sub-nav-item active" onclick="showSubTab('history')">📍 Lịch sử Q.R</div>
-              <!-- ĐÃ XÓA: <div class="sub-nav-item" onclick="showSubTab('reward')">🎁 Lịch sử Thưởng</div> -->
-              <div class="sub-nav-item" onclick="showSubTab('quiz')">❓ Mini Quiz</div>
           </div>
           
           <!-- Old Combined Card Content -->
@@ -716,37 +811,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
                       <!-- Items added via JS -->
                       <li>(Chưa có)</li>
                     </ul>
-                </div>
-            </div>
-            
-            <!-- ĐÃ XÓA: Reward History Section (TAB 2) -->
-            <!-- Loại bỏ div id="sub-tab-reward" -->
-
-            <!-- Quiz Section (TAB 3) -->
-            <div id="sub-tab-quiz" class="sub-tab-content">
-                <div id="quiz-area" style="padding: 10px 15px 15px 15px;">
-                    <h4>❓ Mini Quiz Hiện vật</h4>
-                    <!-- NÚT START QUIZ MỚI (ĐƯỢC DI CHUYỂN LÊN ĐẦU) -->
-                    <button id="quiz-start-button" onclick="startQuiz()" style="width:100%; margin: 5px 0 15px 0;">Bắt đầu Quiz</button>
-
-                    <!-- MỚI: Trạng thái mở khóa quiz -->
-                    <div id="quiz-unlock-status" style="margin-bottom: 10px; font-weight: 500; padding: 10px; border-radius: 8px; text-align: center;">
-                        <!-- Nội dung được cập nhật bằng JS -->
-                    </div>
-                    <!-- MỚI: Banner hình ảnh cho quiz -->
-                    <div id="quiz-banner" style="display:none; margin-bottom: 15px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                        <img id="quiz-banner-img" src="https://placehold.co/350x150/2c3e50/ffffff?text=QUIZ+VỀ+TƯỢNG+ĐÀI+LỊCH+SỬ" alt="Quiz Banner" style="width: 100%; height: auto; display: block;">
-                    </div>
-                    <!-- MỚI: Loader giả lập -->
-                    <div id="quiz-loader" style="text-align: center; display:none; padding: 20px;">
-                        <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block;"></div>
-                        <p style="margin-top: 10px; color: var(--primary-dark);">Đang tải Quiz... Chuẩn bị sẵn sàng!</p>
-                    </div>
-
-                    <div id="quiz-question-container">
-                        <!-- Questions added via JS -->
-                    </div>
-                    <button id="quiz-submit-button" onclick="submitQuiz()" style="display:none; width:100%; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">Hoàn thành Quiz</button>
                 </div>
             </div>
             
@@ -766,7 +830,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
       <div class="nav-item" id="nav-profile" onclick="showTab('profile-tab')"><span>👤</span>Hồ sơ</div>
     </div>
   </div>
-</div>
+<!-- ĐÃ LOẠI BỎ KHUNG <div class="phone"> -->
 
 <script>
 /* ==========================================================================
@@ -820,44 +884,115 @@ function saveProfile() {
    ========================================================================== */
 let visitedArtifacts = []; // Array of { id: string, name: string }
 let quizScore = 0;
+let quizTotalQuestions = 0; // Tổng số câu hỏi đã làm (chứ không phải tổng số câu hỏi có sẵn)
+let artifactQuizStatus = {}; // { artifact_id: boolean (true if done), score: number, selections: {} }
 
-const REWARD_THRESHOLD = 3; 
-// ĐÃ SỬA: Số hiện vật tối thiểu cần tham quan để mở Quiz là 1
-const MIN_ARTIFACTS_FOR_QUIZ = 1; 
-// MỚI: Mã đổi thưởng (Dù không lưu lịch sử, vẫn cần mã này để hiển thị)
+const REWARD_THRESHOLD = 10; // Đã cập nhật thành 10 (tổng số câu hỏi)
 const REWARD_CODE = "DN-BTM-10FF-2025"; 
 
 // Dữ liệu Quiz cố định
-const miniQuizData = [
+// ĐÃ CẬP NHẬT: 10 CÂU HỎI MỚI
+const artifactQuizData = [
     {
-        question: "Trần Hưng Đạo được biết đến nhiều nhất với vai trò gì trong lịch sử Việt Nam?",
+        question: "1. Trần Hưng Đạo có tên thật là gì?",
         options: [
-            { text: "Nhà thơ và học giả", isCorrect: false, answer: "Thường bị nhầm lẫn với các nhà văn hóa khác." },
-            { text: "Quốc công Tiết chế chống Nguyên Mông", isCorrect: true, answer: "Đây là tước vị và vai trò quan trọng nhất của ông." },
-            { text: "Hoàng đế sáng lập triều Trần", isCorrect: false, answer: "Ông là tôn thất, nhưng không phải người sáng lập." },
-            { text: "Người viết Chiếu dời đô", isCorrect: false, answer: "Người viết Chiếu dời đô là Lý Công Uẩn." }
+            { text: "Trần Quốc Toản", isCorrect: false, answer: "Trần Quốc Toản là cháu của Trần Hưng Đạo, nổi tiếng với tinh thần yêu nước khi còn nhỏ." },
+            { text: "Trần Quốc Tuấn", isCorrect: true, answer: "Trần Quốc Tuấn là tên thật và được biết đến nhiều nhất của Trần Hưng Đạo." },
+            { text: "Trần Nhật Duật", isCorrect: false, answer: "Trần Nhật Duật là em trai cùng cha khác mẹ với Trần Hưng Đạo và cũng là một danh tướng." },
+            { text: "Trần Thánh Tông", isCorrect: false, answer: "Trần Thánh Tông là vị Hoàng đế thứ hai của nhà Trần, cha của Trần Nhân Tông." }
         ]
     },
     {
-        question: 'Tác phẩm nổi tiếng "Hịch tướng sĩ" của ông được viết nhằm mục đích gì?',
+        question: "2. Trần Hưng Đạo giữ chức vụ gì nổi bật nhất trong triều Trần?",
         options: [
-            { text: "Kêu gọi binh sĩ quy hàng quân địch", isCorrect: false, answer: "Mục đích hoàn toàn ngược lại." },
-            { text: "Kích lệ tinh thần và ý chí chiến đấu chống quân xâm lược", isCorrect: true, answer: "Đây là mục đích cốt lõi của áng văn." },
-            { text: "Ghi chép về tiểu sử của ông", isCorrect: false, answer: "Đây là văn kiện chiến đấu, không phải tự truyện." },
-            { text: "Bàn về triết lý sống", isCorrect: false, answer: "Tác phẩm tập trung vào tinh thần dân tộc và chiến đấu." }
+            { text: "Thái sư", isCorrect: false, answer: "Thái sư là chức tể tướng, thường do người khác nắm giữ." },
+            { text: "Thượng tướng quân", isCorrect: false, answer: "Đây là một chức vụ quân sự cao cấp, nhưng không phải tước hiệu cao nhất của ông." },
+            { text: "Đại tướng quân – Quốc công Tiết chế", isCorrect: true, answer: "Quốc công Tiết chế là tước vị quân sự cao nhất, được giao toàn quyền chỉ huy quân đội." },
+            { text: "Hàn lâm học sĩ", isCorrect: false, answer: "Đây là chức vụ văn học, không phải chuyên môn của Trần Hưng Đạo." }
         ]
     },
     {
-        question: "Trận Bạch Đằng (1288) đã được Trần Hưng Đạo sử dụng chiến thuật gì?",
+        question: "3. Trần Hưng Đạo nổi tiếng với chiến thắng nào trước quân Mông – Nguyên?",
         options: [
-            { text: "Công thành chiến kéo dài", isCorrect: false, answer: "Chiến thuật này không phù hợp với sông nước." },
-            { text: "Tập kích bằng kỵ binh", isCorrect: false, answer: "Trận chiến diễn ra trên sông nước." },
-            { text: "Sử dụng cọc ngầm kết hợp thủy triều", isCorrect: true, answer: "Đây là chiến thuật nổi tiếng đã nhấn chìm hạm đội Nguyên Mông." },
-            { text: "Đánh lén ban đêm", isCorrect: false, answer: "Trận đánh này là trận thủy chiến lớn." }
+            { text: "Chiến thắng Rạch Gầm – Xoài Mút", isCorrect: false, answer: "Chiến thắng này thuộc về Nguyễn Huệ (quân Tây Sơn) chống quân Xiêm." },
+            { text: "Chiến thắng Chi Lăng", isCorrect: false, answer: "Chiến thắng này thuộc về Lê Lợi và Nguyễn Trãi chống quân Minh (Trung Quốc)." },
+            { text: "Chiến thắng Bạch Đằng (1288)", isCorrect: true, answer: "Trận Bạch Đằng năm 1288 là chiến thắng quyết định, kết thúc cuộc kháng chiến lần thứ ba." },
+            { text: "Chiến thắng Đống Đa", isCorrect: false, answer: "Chiến thắng này thuộc về Nguyễn Huệ (quang Trung) chống quân Thanh (Trung Quốc)." }
+        ]
+    },
+    {
+        question: "4. Tác phẩm nổi tiếng được cho là do Trần Hưng Đạo soạn để khích lệ quân sĩ là?",
+        options: [
+            { text: "Hịch tướng sĩ", isCorrect: true, answer: "Hịch tướng sĩ là áng văn yêu nước hùng hồn, có tác dụng hiệu triệu và khích lệ tinh thần quân sĩ nhà Trần." },
+            { text: "Nam quốc sơn hà", isCorrect: false, answer: "Đây là áng thơ được cho là của Lý Thường Kiệt, ra đời thời Lý." },
+            { text: "Bình Ngô đại cáo", isCorrect: false, answer: "Bình Ngô đại cáo là của Nguyễn Trãi, ra đời thời Lê Sơ." },
+            { text: "Thiên đô chiếu", isCorrect: false, answer: "Thiên đô chiếu là Chiếu dời đô của Lý Công Uẩn, ra đời thời Lý." }
+        ]
+    },
+    {
+        question: "5. Trần Hưng Đạo là con của ai?",
+        options: [
+            { text: "Trần Thủ Độ", isCorrect: false, answer: "Trần Thủ Độ là người nắm quyền lực lớn nhất đầu triều Trần và là chú họ của ông." },
+            { text: "Trần Liễu", isCorrect: true, answer: "Trần Hưng Đạo là con của An Sinh Vương Trần Liễu, anh ruột của Vua Trần Thái Tông." },
+            { text: "Trần Quang Khải", isCorrect: false, answer: "Trần Quang Khải là em trai cùng mẹ của Vua Trần Thái Tông, đồng thời là đối thủ và sau này là đồng chí của ông." },
+            { text: "Trần Nhật Duật", isCorrect: false, answer: "Trần Nhật Duật là em của Trần Hưng Đạo." }
+        ]
+    },
+    {
+        question: "6. Dòng sông nơi diễn ra trận Bạch Đằng (1288) do Trần Hưng Đạo chỉ huy nằm ở đâu?",
+        options: [
+            { text: "Sông Hồng", isCorrect: false, answer: "Sông Hồng là con sông lớn chảy qua miền Bắc, không phải địa điểm chính của trận thủy chiến này." },
+            { text: "Sông Thu Bồn", isCorrect: false, answer: "Sông Thu Bồn nằm ở khu vực Quảng Nam, không liên quan đến trận Bạch Đằng." },
+            { text: "Sông Cả", isCorrect: false, answer: "Sông Cả nằm ở miền Trung (Nghệ An/Hà Tĩnh)." },
+            { text: "Sông Bạch Đằng", isCorrect: true, answer: "Trận chiến này diễn ra tại cửa sông Bạch Đằng, ranh giới giữa Hải Phòng và Quảng Ninh ngày nay." }
+        ]
+    },
+    {
+        question: "7. Tên khu di tích thờ Trần Hưng Đạo nổi tiếng ở Nam Định là gì?",
+        options: [
+            { text: "Đền Trần", isCorrect: true, answer: "Đền Trần (Nam Định) là nơi thờ các vị Vua nhà Trần và Trần Hưng Đạo, gắn liền với hội Khai ấn." },
+            { text: "Đền Hùng", isCorrect: false, answer: "Đền Hùng thờ các Vua Hùng, tổ tiên dân tộc Việt Nam." },
+            { text: "Đền Kiếp Bạc", isCorrect: false, answer: "Đền Kiếp Bạc (Hải Dương) là nơi thờ Trần Hưng Đạo, gắn liền với phủ đệ của ông." },
+            { text: "Đền Ngọc Sơn", isCorrect: false, answer: "Đền Ngọc Sơn (Hà Nội) thờ Trần Hưng Đạo và một số vị thần khác." }
+        ]
+    },
+    {
+        question: "8. Kiệt tác quân sự nào được Trần Hưng Đạo viết để truyền lại kinh nghiệm chống giặc?",
+        options: [
+            { text: "Binh thư yếu lược", isCorrect: true, answer: "Binh thư yếu lược là cuốn sách tóm tắt các nguyên tắc quân sự, là tài liệu quý giá cho các đời sau." },
+            { text: "Quân trung từ mệnh tập", isCorrect: false, answer: "Đây là tác phẩm của Nguyễn Trãi, chủ yếu là thư từ ngoại giao." },
+            { text: "Lịch triều hiến chương loại chí", isCorrect: false, answer: "Đây là bộ bách khoa toàn thư lịch sử do Phan Huy Chú biên soạn." },
+            { text: "Đại Việt sử ký toàn thư", isCorrect: false, answer: "Đây là bộ quốc sử do Ngô Sĩ Liên biên soạn." }
+        ]
+    },
+    {
+        question: "9. Trần Hưng Đạo có công lớn trong mấy lần kháng chiến chống Mông – Nguyên?",
+        options: [
+            { text: "1 lần", isCorrect: false, answer: "Quân dân nhà Trần đã kháng chiến tổng cộng 3 lần." },
+            { text: "2 lần", isCorrect: false, answer: "Trần Hưng Đạo tham gia chỉ huy cả ba lần kháng chiến (1258, 1285, 1288)." },
+            { text: "3 lần", isCorrect: true, answer: "Trần Hưng Đạo tham gia chỉ huy cả ba lần kháng chiến chống quân Nguyên Mông (1258, 1285, 1288)." },
+            { text: "4 lần", isCorrect: false, answer: "Quân dân nhà Trần chỉ trải qua 3 lần kháng chiến lớn." }
+        ]
+    },
+    {
+        question: "10. Câu nói nổi tiếng của Trần Hưng Đạo thể hiện tinh thần yêu nước là gì?",
+        options: [
+            { text: "“Sát Thát!”", isCorrect: false, answer: "Đây là khẩu hiệu của binh sĩ nhà Trần, không phải là câu nói nổi tiếng riêng của ông trước vua." },
+            { text: "“Một tấc đất của tiền nhân để lại cũng không được để lọt vào tay kẻ khác.”", isCorrect: false, answer: "Câu này thể hiện chủ quyền, nhưng không phải câu nói nổi tiếng của ông trước vua." },
+            { text: "“Đầu thần chưa rơi xuống đất, xin bệ hạ đừng lo.”", isCorrect: true, answer: "Đây là câu trả lời của ông với vua Trần Nhân Tông, thể hiện sự quyết tâm chiến đấu đến cùng, không đầu hàng." },
+            { text: "“Nam quốc sơn hà Nam đế cư.”", isCorrect: false, answer: "Đây là câu thơ nổi tiếng được cho là của Lý Thường Kiệt." }
         ]
     }
 ];
 
+// Hàm lấy Quiz dựa trên Artifact ID (Mô phỏng: chỉ có quiz cho artifact_123)
+function getQuizForArtifact(artifactId) {
+    if (artifactId === 'artifact_123') {
+        // Cần sao chép dữ liệu để tránh việc Quiz bị sửa đổi global khi làm bài
+        return JSON.parse(JSON.stringify(artifactQuizData));
+    }
+    return null;
+}
 
 // --- PROFILE / QUIZ LOGIC (CẬP NHẬT) ---
 
@@ -900,135 +1035,193 @@ function showSubTab(tabId) {
     // Hiển thị nội dung tab được chọn
     document.getElementById(`sub-tab-${tabId}`).classList.add('active');
     // Đánh dấu nút đang hoạt động
-    document.querySelector(`.sub-nav-item[onclick*="'${tabId}'"]`).classList.add('active');
-    
-    // Logic đặc biệt cho tab Quiz
-    if (tabId === 'quiz') {
-        renderProfileHistoryQuiz(true); // Chỉ render Quiz Status khi vào tab Quiz
-    }
+    // KHẮC PHỤC LỖI: Chỉ có sub-nav cho history, nên chỉ cần tìm đúng item này
+    document.querySelector('.sub-nav-item').classList.add('active');
 }
 
 function renderProfileMain() {
-    // Only update score/reward status on the main card
+    // Tính lại tổng số câu hỏi và điểm
+    quizTotalQuestions = Object.keys(artifactQuizStatus).length;
+    let currentQuizScore = 0;
+    Object.values(artifactQuizStatus).forEach(status => {
+        if (status.score !== undefined) { // Chỉ tính điểm của những quiz đã làm
+            currentQuizScore += status.score;
+        }
+    });
+    quizScore = currentQuizScore;
+
     const scoreEl = document.getElementById('quiz-score');
-    scoreEl.innerText = `${quizScore}/${miniQuizData.length}`;
+    const totalEl = document.getElementById('quiz-total-score');
+    scoreEl.innerText = quizScore;
+    // Cập nhật tổng số câu hỏi tối đa có thể trả lời (số quiz đã làm * số câu hỏi/quiz)
+    totalEl.innerText = Object.values(artifactQuizStatus).filter(s => s.done).length * artifactQuizData.length; 
+
     checkRewardStatus(); // Vẫn cần gọi để cập nhật thẻ thưởng trên màn hình chính
     updateProfileDisplay(); // Cập nhật tên người dùng
 }
 
-function renderProfileHistoryQuiz(isQuizTabActive = false) {
+function renderProfileHistoryQuiz() {
     const visitedList = document.getElementById('visited-locations');
-    // ĐÃ XÓA: const rewardList = document.getElementById('reward-history-list');
-    const quizStartBtn = document.getElementById('quiz-start-button');
-    const quizUnlockStatus = document.getElementById('quiz-unlock-status');
-    const quizBanner = document.getElementById('quiz-banner');
-    const quizLoader = document.getElementById('quiz-loader');
-    const quizContainer = document.getElementById('quiz-question-container');
     
     // 1. Cập nhật danh sách đã tham quan
     visitedList.innerHTML = visitedArtifacts.length > 0
-        ? visitedArtifacts.map(a => `<li>🖼️ ${a.name} (${a.id})</li>`).join('')
+        ? visitedArtifacts.map(a => {
+            const status = artifactQuizStatus[a.id];
+            // Lấy tổng số câu hỏi từ data. Nếu không có data, mặc định là 10 (vì chỉ có quiz 10 câu)
+            const totalQ = status && status.total ? status.total : artifactQuizData.length; 
+            let statusText = 'Chưa Quiz';
+            if (status && status.done) {
+                statusText = status.score > 0 ? `✅ Quiz: ${status.score}/${totalQ}` : `❌ Quiz: ${status.score}/${totalQ}`;
+            }
+            return `<li>🖼️ ${a.name} (${a.id}) - ${statusText}</li>`;
+        }).join('')
         : '<li>(Chưa có)</li>';
-        
-    // 2. ĐÃ XÓA LOGIC CẬP NHẬT LỊCH SỬ ĐỔI THƯỞNG
-
-    // 3. KIỂM TRA ĐIỀU KIỆN MỞ KHÓA QUIZ
-    const visitedCount = visitedArtifacts.length;
-    const isQuizUnlocked = visitedCount >= MIN_ARTIFACTS_FOR_QUIZ;
-    
-    if (isQuizUnlocked) {
-        quizUnlockStatus.innerHTML = `🌟 **Quiz đã mở khóa!** (${visitedCount}/${MIN_ARTIFACTS_FOR_QUIZ} hiện vật)`;
-        quizUnlockStatus.style.backgroundColor = '#ccffcc';
-        quizUnlockStatus.style.color = 'var(--primary-dark)';
-        quizStartBtn.disabled = false;
-        quizStartBtn.style.opacity = 1;
-    } else {
-        const remaining = MIN_ARTIFACTS_FOR_QUIZ - visitedCount;
-        quizUnlockStatus.innerHTML = `🔒 Cần tham quan thêm ${remaining} hiện vật để mở khóa Quiz.`;
-        quizUnlockStatus.style.backgroundColor = '#ffe0e0';
-        quizUnlockStatus.style.color = '#e74c3c';
-        quizStartBtn.disabled = true;
-        quizStartBtn.style.opacity = 0.5;
-    }
-    
-    // 4. Reset Quiz Data (Chỉ reset trạng thái làm bài, không reset điểm)
-    miniQuizData.forEach(q => {
-        if (q.selectedOptionIndex === undefined) q.selectedOptionIndex = null;
-        if (q.submitted === undefined) q.submitted = false;
-    });
-
-    // 5. Quản lý hiển thị UI trong Tab Quiz
-    if (isQuizTabActive) {
-        // Mặc định ẩn container câu hỏi, banner, và nút nộp
-        quizContainer.style.display = 'none';
-        quizBanner.style.display = 'none';
-        quizLoader.style.display = 'none';
-        document.getElementById('quiz-submit-button').style.display = 'none';
-        
-        // Luôn hiển thị nút Bắt đầu Quiz khi mới vào màn hình (nếu đã mở khóa)
-        quizStartBtn.style.display = 'inline-block';
-
-        // Nếu người dùng đã nộp bài (để xem lại kết quả), hiển thị lại kết quả
-        if (miniQuizData.some(q => q.submitted)) {
-            quizContainer.style.display = 'block';
-            renderQuizQuestions(false); // Render kết quả đã nộp (non-interactive)
-        } else {
-            // Nếu chưa làm hoặc đã reset, đảm bảo container câu hỏi trống
-            quizContainer.innerHTML = '';
-        }
-    }
 }
 
 function renderProfile() {
-    // Render main view content and ensure sub-view content is initialized
     renderProfileMain();
     renderProfileHistoryQuiz();
     showProfileSubScreen('profile-main-view'); // Ensure main view is visible on tab switch
 }
 
+/**
+ * NEW FUNCTION: Hàm xử lý sự kiện nhấn nút Bắt đầu Quiz
+ */
+function handleStartQuiz() {
+    if (!currentArtifactData || !getQuizForArtifact(currentArtifactData.id)) {
+        showAlert("Không có Quiz cho hiện vật này hoặc chưa quét QR.");
+        return;
+    }
+    // CHUYỂN SANG MÀN HÌNH QUIZ RIÊNG
+    document.getElementById('main-screen').classList.add('hidden');
+    document.getElementById('quiz-standalone-screen').classList.remove('hidden');
 
-function startQuiz() {
-    // Reset trạng thái quiz
-    miniQuizData.forEach(q => {
-        q.selectedOptionIndex = null;
-        q.submitted = false;
-    });
-    quizScore = 0;
-    
-    const quizStartBtn = document.getElementById('quiz-start-button');
-    const quizContainer = document.getElementById('quiz-question-container');
-    const quizBanner = document.getElementById('quiz-banner');
-    const quizLoader = document.getElementById('quiz-loader');
-    
-    quizStartBtn.style.display = 'none';
-    quizContainer.style.display = 'none';
-    
-    // MỚI: Hiển thị loader và banner trước
-    quizBanner.style.display = 'block';
-    quizLoader.style.display = 'block';
-    
-    showAlert("Đang tải Quiz...");
-
-    // MÔ PHỎNG ĐỘ TRỄ KHI BẮT ĐẦU QUIZ
-    setTimeout(() => {
-        quizLoader.style.display = 'none';
-        quizContainer.style.display = 'block';
-        
-        document.getElementById('quiz-submit-button').style.display = 'inline-block';
-        renderQuizQuestions(true); // Bắt đầu mode tương tác
-        showAlert("Quiz đã bắt đầu. Hãy trả lời các câu hỏi!");
-    }, 1000); // 1 giây mô phỏng tải
+    // GỌI HÀM KHỞI TẠO QUIZ TRÊN MÀN HÌNH RIÊNG
+    startArtifactQuiz(currentArtifactData, 'standalone');
 }
 
-function renderQuizQuestions(interactive = false) {
-    const container = document.getElementById('quiz-question-container');
+/**
+ * NEW FUNCTION: Quay lại tab QR
+ */
+function backToQrTab() {
+    document.getElementById('quiz-standalone-screen').classList.add('hidden');
+    document.getElementById('main-screen').classList.remove('hidden');
+    showTab('qr-tab'); // Đảm bảo quay về tab Quét QR
+}
+
+
+// Hàm khởi tạo/hiển thị Quiz tại màn hình Riêng (Standalone)
+function startArtifactQuiz(artifactData, mode = 'standalone') {
+    // Xác định ID của các thành phần dựa trên mode (standalone/qr)
+    const suffix = mode === 'standalone' ? 'standalone' : 'qr';
+    const quizSection = document.getElementById(`quiz-section-${suffix}`);
+    // const quizTitle = document.getElementById(`quiz-title-${suffix}`); // ĐÃ XÓA
+    const startQuizBtn = document.getElementById('start-quiz-button-qr'); // Chỉ có trên QR tab
+
+    // Lấy Quiz data
+    const quizData = getQuizForArtifact(artifactData.id);
+    if (!quizData) {
+        quizSection.style.display = 'none';
+        return;
+    }
+    
+    // Nếu đang ở QR tab, nút bắt đầu chính phải ẩn khi quiz section hiển thị
+    if (mode !== 'standalone') {
+        startQuizBtn.style.display = 'none'; 
+    }
+    
+    // Đặt biến quiz data tạm thời
+    currentArtifactQuizData = quizData; 
+
+    // ĐÃ XÓA: quizTitle.innerText = `❓ Quiz về ${artifactData.name}`;
+    
+    // Khôi phục lại cấu trúc ban đầu của quiz content
+    const quizContent = document.getElementById(`quiz-content-${suffix}`);
+    // Đảm bảo truyền mode vào submitArtifactQuiz
+    quizContent.innerHTML = `<div id="quiz-question-container-${suffix}"></div><button id="quiz-submit-button-${suffix}" onclick="submitArtifactQuiz('${mode}')" style="display:none; width:100%; margin-top: 15px; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">Hoàn thành Quiz</button><div id="quiz-feedback-${suffix}" class="quiz-result-message" style="display: none;"></div>`;
+
+    // Lấy lại các tham chiếu DOM sau khi gán lại innerHTML
+    const newQuizContainer = document.getElementById(`quiz-question-container-${suffix}`);
+    const newQuizSubmitBtn = document.getElementById(`quiz-submit-button-${suffix}`);
+    const newQuizFeedback = document.getElementById(`quiz-feedback-${suffix}`);
+
+    const quizStatus = artifactQuizStatus[artifactData.id];
+    
+    // Nếu đã làm quiz, hiển thị kết quả và nút làm lại
+    if (quizStatus && quizStatus.done) {
+        const resultMsg = `Bạn đã hoàn thành Quiz này và đạt ${quizStatus.score}/${quizData.length} điểm đúng!`;
+        
+        newQuizFeedback.className = quizStatus.score > 0 ? 'quiz-result-message quiz-success' : 'quiz-result-message quiz-fail';
+        newQuizFeedback.innerText = resultMsg;
+        newQuizFeedback.style.display = 'block';
+        newQuizSubmitBtn.style.display = 'none';
+
+        // Hiển thị câu hỏi ở chế độ xem kết quả (non-interactive)
+        renderQuizQuestionsQR(quizData, newQuizContainer, false, quizStatus.selections, mode);
+
+        // Thêm nút làm lại
+        let restartBtn = document.getElementById('restart-quiz-btn');
+        if(!restartBtn) {
+            restartBtn = document.createElement('button');
+            restartBtn.id = 'restart-quiz-btn';
+            restartBtn.innerText = 'Làm lại Quiz';
+            restartBtn.style.marginTop = '15px';
+            restartBtn.style.background = 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
+            restartBtn.onclick = () => {
+                // Xóa trạng thái đã làm trong bộ nhớ tạm (chỉ reset trạng thái làm bài)
+                artifactQuizStatus[artifactData.id] = { done: false, score: 0, selections: {}, total: artifactQuizData.length };
+                // Gọi lại hàm để tải Quiz ở chế độ làm bài mới
+                startArtifactQuiz(artifactData, mode); 
+            };
+            quizContent.appendChild(restartBtn);
+        }
+        
+    } else {
+        // Chế độ làm bài mới 
+        newQuizFeedback.style.display = 'none';
+        newQuizSubmitBtn.style.display = 'inline-block';
+        // ĐÃ SỬA LỖI: Chỉ truyền mode vào hàm submitArtifactQuiz
+        newQuizSubmitBtn.onclick = () => submitArtifactQuiz(mode);
+        
+        // Render Quiz mới (interactive)
+        // Reset selections cho lần làm bài mới
+        quizData.forEach(q => q.selectedOptionIndex = null);
+        renderQuizQuestionsQR(quizData, newQuizContainer, true, {}, mode);
+        
+        let restartBtn = document.getElementById('restart-quiz-btn');
+        if(restartBtn) restartBtn.remove();
+    }
+
+    quizSection.style.display = 'flex';
+}
+
+// NEW FUNCTION: Render Quiz Questions specifically for Standalone/QR tab
+function renderQuizQuestionsQR(quizData, container, interactive, selections = {}, mode = 'standalone') {
+    // Xác định prefix cho query selector
+    const prefix = mode === 'standalone' ? 'standalone' : 'qr';
+
     container.innerHTML = '';
     
-    miniQuizData.forEach((q, index) => {
+    // ** THÊM TIÊU ĐỀ TRỞ LẠI VÀO PHẦN TRÊN CỦA container **
+    /* Dòng này đã được xóa */
+    // const quizTitleEl = document.getElementById(`quiz-title-${prefix}`);
+    // if (quizTitleEl) {
+    //     quizTitleEl.innerText = `❓ Quiz về ${currentArtifactData.name}`; 
+    // }
+    
+    quizData.forEach((q, index) => {
         const qEl = document.createElement('div');
         qEl.className = 'quiz-question';
-        qEl.innerHTML = `<h4>Câu ${index + 1}: ${q.question}</h4>`;
+        // Hiển thị câu hỏi: q.question đã chứa số thứ tự
+        // Đã sửa: Sử dụng thẻ h4 để hiển thị câu hỏi, giúp nó nổi bật và tách khỏi các lựa chọn
+        qEl.innerHTML = `<h4>${q.question}</h4>`; 
         
+        // Lấy thông tin về đáp án đúng cho câu này
+        const correctAnswerOption = q.options.findIndex(opt => opt.isCorrect);
+        // Tìm ra rationale cho câu trả lời đúng
+        const correctRationale = q.options[correctAnswerOption]?.answer || "Không có giải thích.";
+        let rationaleAppended = false;
+
         q.options.forEach((opt, optIndex) => {
             const optBtn = document.createElement('button');
             optBtn.className = 'quiz-option';
@@ -1036,41 +1229,74 @@ function renderQuizQuestions(interactive = false) {
             optBtn.setAttribute('data-q-index', index);
             optBtn.setAttribute('data-opt-index', optIndex);
             
+            // Lấy selection từ data model tạm thời
+            const currentSelection = interactive ? currentArtifactQuizData[index]?.selectedOptionIndex : selections[index];
+
+            // Xử lý sự kiện click
             if (interactive) {
-                optBtn.onclick = () => selectQuizOption(optBtn, index, optIndex);
-                // Giữ lựa chọn nếu đã có
-                if (q.selectedOptionIndex === optIndex) {
+                optBtn.onclick = () => selectQuizOptionQR(optBtn, index, optIndex, prefix);
+                // Giữ lựa chọn
+                if (currentSelection === optIndex) {
                     optBtn.classList.add('active-selection');
-                    optBtn.style.backgroundColor = '#d1e5d4'; // Màu xanh nhạt khi chọn
+                    optBtn.style.backgroundColor = '#d1e5d4'; 
                 }
             } else {
-                // Chế độ xem kết quả (sau khi submit)
-                optBtn.disabled = true; // Vô hiệu hóa nút
-                if (q.submitted && opt.isCorrect) {
-                    optBtn.classList.add('correct-answer');
-                } else if (q.submitted && q.selectedOptionIndex === optIndex && !opt.isCorrect) {
-                    optBtn.classList.add('incorrect-answer');
+                // Chế độ xem kết quả (non-interactive)
+                optBtn.disabled = true; 
+                const selectedIndex = currentSelection;
+
+                // 1. Highlight câu trả lời đúng (Luôn là màu xanh lá)
+                if (opt.isCorrect) {
+                    optBtn.classList.add('correct-answer'); 
+                } 
+                
+                // 2. Highlight lựa chọn của người dùng (Tô đỏ nếu sai)
+                if (selectedIndex === optIndex) {
+                    if (selectedIndex !== correctAnswerOption) {
+                        // Tô đỏ câu trả lời SAI MÀ NGƯỜI DÙNG ĐÃ CHỌN
+                        optBtn.classList.add('incorrect-answer'); 
+                    } 
                 }
             }
             qEl.appendChild(optBtn);
         });
         
-        // Hiển thị rationale sau khi submit
-        if (q.submitted) {
+        // 3. Hiển thị Rationale (Chỉ hiển thị sau khi nộp bài)
+        if (!interactive) {
             const rationaleEl = document.createElement('p');
             rationaleEl.style.marginTop = '10px';
-            rationaleEl.style.color = q.options[q.selectedOptionIndex]?.isCorrect ? '#1b5e20' : '#b71c1c';
-            rationaleEl.innerHTML = `Giải thích: ${q.options.find(o => o.isCorrect).answer}`;
+            rationaleEl.style.padding = '10px';
+            rationaleEl.style.borderRadius = '8px';
+            rationaleEl.style.backgroundColor = '#f0f0f0';
+            rationaleEl.style.color = '#555';
+            rationaleEl.style.textAlign = 'left';
+            rationaleEl.innerHTML = `<b>Giải thích:</b> ${correctRationale}`;
             qEl.appendChild(rationaleEl);
         }
-
+        
+        // Thêm trường dữ liệu tạm để lưu lựa chọn (chỉ dùng khi interactive)
+        if (interactive) {
+            // Cập nhật selectedOptionIndex trong currentArtifactQuizData cho lần làm bài mới
+            if (currentArtifactQuizData && currentArtifactQuizData[index]) {
+                if (currentArtifactQuizData[index].selectedOptionIndex === undefined) {
+                    currentArtifactQuizData[index].selectedOptionIndex = currentSelection !== undefined ? currentSelection : null;
+                }
+            }
+        }
+        
         container.appendChild(qEl);
     });
 }
 
-function selectQuizOption(button, qIndex, optIndex) {
+// NEW FUNCTION: Select option for Quiz
+function selectQuizOptionQR(button, qIndex, optIndex, prefix) {
+    // Đảm bảo currentArtifactQuizData đã được khởi tạo
+    if (!currentArtifactQuizData) {
+        currentArtifactQuizData = getQuizForArtifact(currentArtifactData.id);
+    }
+
     // Xóa lựa chọn cũ
-    document.querySelectorAll(`.quiz-option[data-q-index="${qIndex}"]`).forEach(btn => {
+    document.querySelectorAll(`#quiz-question-container-${prefix} .quiz-option[data-q-index="${qIndex}"]`).forEach(btn => {
         btn.classList.remove('active-selection');
         btn.style.backgroundColor = '#f7f7f7';
     });
@@ -1078,63 +1304,81 @@ function selectQuizOption(button, qIndex, optIndex) {
     // Đặt lựa chọn mới
     button.classList.add('active-selection');
     button.style.backgroundColor = '#d1e5d4';
-    miniQuizData[qIndex].selectedOptionIndex = optIndex;
+
+    // Lưu lựa chọn vào data model tạm thời
+    currentArtifactQuizData[qIndex].selectedOptionIndex = optIndex;
 }
 
-function submitQuiz() {
+
+// NEW FUNCTION: Submit Quiz cho Hiện vật
+function submitArtifactQuiz(mode) {
+    const finalQuizData = currentArtifactQuizData;
+    
+    const suffix = mode === 'standalone' ? 'standalone' : 'qr';
+    const artifactData = currentArtifactData;
+
+    if (!finalQuizData || !finalQuizData.every(q => q.selectedOptionIndex !== null && q.selectedOptionIndex !== undefined)) {
+         showAlert("Vui lòng trả lời tất cả các câu hỏi trước khi nộp bài!");
+         return;
+    }
+
     let correctCount = 0;
-    miniQuizData.forEach(q => {
-        q.submitted = true;
-        if (q.selectedOptionIndex !== null && q.options[q.selectedOptionIndex]?.isCorrect) {
+    let totalQuestions = finalQuizData.length;
+    let selections = {};
+
+    finalQuizData.forEach((q, index) => {
+        // Cần kiểm tra q.selectedOptionIndex !== undefined vì có thể là 0
+        selections[index] = q.selectedOptionIndex;
+        if (q.selectedOptionIndex !== null && q.selectedOptionIndex !== undefined && q.options[q.selectedOptionIndex]?.isCorrect) {
             correctCount++;
         }
     });
-    
-    quizScore = correctCount;
-    renderQuizQuestions(false); // Render ở chế độ xem kết quả
-    renderProfileMain(); // Cập nhật điểm và trạng thái phần thưởng trên màn hình chính
-    
-    document.getElementById('quiz-banner').style.display = 'none'; // Ẩn banner khi nộp
-    document.getElementById('quiz-submit-button').style.display = 'none';
-    document.getElementById('quiz-start-button').style.display = 'inline-block';
-    
-    // CẬP NHẬT: THÔNG BÁO NHẬN THƯỞNG NGAY LẬP TỨC 
-    const requiredCorrect = REWARD_THRESHOLD;
-    if (quizScore >= requiredCorrect) {
-        // LƯU LỊCH SỬ NHẬN THƯỞNG (ĐÃ XÓA LOGIC LƯU VÀO rewardHistory)
 
-        showAlert(`🎉 CHÚC MỪNG! Bạn đã đạt ${quizScore}/${miniQuizData.length} điểm và nhận được Phiếu giảm giá 10%!`);
-    } else {
-        showAlert(`Bạn đã hoàn thành Quiz với ${quizScore}/${miniQuizData.length} điểm!`);
-    }
+    // Cập nhật trạng thái Quiz cho hiện vật này
+    artifactQuizStatus[artifactData.id] = {
+        done: true,
+        score: correctCount,
+        total: totalQuestions,
+        selections: selections 
+    };
+    
+    // Cập nhật lại giao diện
+    renderProfileMain(); 
+    
+    // Tải lại Quiz ở chế độ xem kết quả
+    startArtifactQuiz(artifactData, mode); 
+    
+    // Thông báo cho người dùng
+    const feedbackText = correctCount > 0 
+        ? `🎉 Chúc mừng! Bạn trả lời đúng ${correctCount}/${totalQuestions} câu. Điểm đã được tích lũy!`
+        : `Bạn đã trả lời ${correctCount}/${totalQuestions} câu.` + (correctCount < totalQuestions ? ` Cố gắng làm lại để đạt điểm cao hơn nhé!` : "");
+        
+    showAlert(feedbackText);
 }
 
-// HÀM NÂNG CẤP PHẦN THƯỞNG
+// HÀM NÂNG CẤP PHẦN THƯỞNG (Dựa trên quizScore tích lũy)
 function checkRewardStatus() {
-    const statusEl = document.getElementById('reward-status');
     const displayEl = document.getElementById('reward-status-display');
-    const totalCorrect = miniQuizData.length;
-    const requiredCorrect = REWARD_THRESHOLD; // Cần 3/3 điểm để nhận thưởng
+    const requiredScore = REWARD_THRESHOLD; 
 
-    if (quizScore >= requiredCorrect) {
-        // HIỂN THỊ MÃ ĐỔI THƯỞNG VÀ QR CODE GIẢ LẬP
+    if (quizScore >= requiredScore) {
+        // HIỂN THỊ MÃ ĐỔI THƯỞNG
         const code = REWARD_CODE;
-        const qrPlaceholder = `https://placehold.co/100x100/27ae60/ffffff?text=CODE`;
 
         displayEl.innerHTML = `
             <p style="color: var(--primary-dark); font-weight: bold; font-size: 16px; margin-bottom: 8px;">
-                🎉 **Đã Nhận Thưởng!**
+                🎉 Đã Đủ Điểm!
             </p>
-            <p style="color: var(--primary-dark);">Bạn đã nhận được Phiếu giảm giá **10%**.</p>
+            <p style="color: var(--primary-dark);">Bạn đã nhận được Phiếu giảm giá 10%.</p>
             <p style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">Mã đổi thưởng: <b style="color: #e67e22;">${code}</b>. Xuất trình mã này tại quầy.</p>
         `;
         document.getElementById('reward-card').style.borderLeft = '5px solid var(--accent-color)';
     } else {
         // HIỂN THỊ THÔNG BÁO THIẾU ĐIỂM
-        const missing = requiredCorrect - quizScore;
+        const missing = requiredScore - quizScore;
         displayEl.innerHTML = `
-            <p id="reward-status">Hoàn thành ${requiredCorrect}/${totalCorrect} câu đúng để nhận quà!</p>
-            <p style="color: #e67e22; font-weight: 500;">Bạn cần đúng thêm ${missing} câu nữa.</p>
+            <p id="reward-status">Tích lũy ${requiredScore} điểm đúng để nhận quà!</p>
+            <p style="color: #e67e22; font-weight: 500;">Bạn cần thêm ${missing} điểm đúng nữa.</p>
         `;
          document.getElementById('reward-card').style.borderLeft = '5px solid var(--primary-dark)';
     }
@@ -1144,25 +1388,29 @@ function checkRewardStatus() {
 /* ==========================================================================
    PHẦN 1: LOGIC AI MOCKUP (TRẢ LỜI CỐ ĐỊNH)
    ========================================================================== */
+let isProcessing = false; // Biến cờ để ngăn chặn gửi tin nhắn liên tục
 
 /**
  * Các câu trả lời giả lập cho các câu hỏi mẫu về Trần Hưng Đạo.
+ * Đã xóa ký tự 🤖
  */
 const mockAnswers = {
-    'tiểusửtrầnhưngđạo?': '🤖 Trần Hưng Đạo (Trần Quốc Tuấn, 1228–1300) là Quốc công Tiết chế triều Trần, người chỉ huy quân dân Đại Việt 3 lần đánh thắng quân Nguyên Mông. Ông được xem là một trong 10 vị tướng vĩ đại nhất lịch sử thế giới.',
-    'tácphẩmnổitiếngnhấtcủatrầnhưngđạo?': '🤖 Tác phẩm nổi tiếng nhất của ông là "Hịch tướng sĩ", một áng văn yêu nước hùng hồn, khích lệ tinh thần chiến đấu của quân đội trước họa xâm lăng Nguyên Mông.',
-    'trậnchiếnbạchđằngdiễnrakhinào?': '🤖 Trận chiến Bạch Đằng lịch sử diễn ra vào năm 1288, với chiến thuật cắm cọc ngầm độc đáo của Trần Hưng Đạo, nhấn chìm gần hết đoàn thuyền chiến của quân Nguyên.',
-    'ýnghĩacâunói"bệhạchémđầuthầnrồihãyhàng"?': '🤖 Câu nói thể hiện tinh thần yêu nước tuyệt đối, quyết tử vì đất nước của ông. Nó củng cố niềm tin và ý chí không khuất phục của triều đình và toàn quân dân nhà Trần.',
-    'xin chào': '🤖 Chào bạn! Tôi đang ở chế độ **mô phỏng**. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi mặc định!',
-    'chào': '🤖 Chào bạn! Tôi đang ở chế độ **mô phỏng**. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi mặc định!',
-    'hi': '🤖 Chào bạn! Tôi đang ở chế độ **mô phỏng**. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi mặc định!',
+    'tiểusửtrầnhưngđạo': 'Trần Hưng Đạo (Trần Quốc Tuấn, 1228–1300) là Quốc công Tiết chế triều Trần, người chỉ huy quân dân Đại Việt 3 lần đánh thắng quân Nguyên Mông. Ông được xem là một trong 10 vị tướng vĩ đại nhất lịch sử thế giới.',
+    'tácphẩmnổitiếngnhấtcủatrầnhưngđạo': 'Tác phẩm nổi tiếng nhất của ông là "Hịch tướng sĩ", một áng văn yêu nước hùng hồn, khích lệ tinh thần chiến đấu của quân đội trước họa xâm lăng Nguyên Mông.',
+    'trậnchiếnbạchđằngdiễnrakhinào': 'Trận chiến Bạch Đằng lịch sử diễn ra vào năm 1288, với chiến thuật cắm cọc ngầm độc đáo của Trần Hưng Đạo, nhấn chìm gần hết đoàn thuyền chiến của quân Nguyên.',
+    // Sửa lỗi: Loại bỏ dấu nháy kép thừa trong khóa từ điển
+    'ýnghĩacâunóibệhạchémđầuthầnrồihãyhàng': 'Câu nói thể hiện tinh thần yêu nước tuyệt đối, quyết tử vì đất nước của ông. Nó củng cố niềm tin và ý chí không khuất phục của triều đình và toàn quân dân nhà Trần.',
+    'xin chào': 'Chào bạn! Tôi đang ở chế độ mô phỏng. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi được lập trình sẵn!',
+    'chào': 'Chào bạn! Tôi đang ở chế độ mô phỏng. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi được lập trình sẵn!',
+    'hi': 'Chào bạn! Tôi đang ở chế độ mô phỏng. Bạn có thể hỏi tôi các câu hỏi mẫu về Trần Hưng Đạo hoặc gõ câu hỏi bất kỳ để xem phản hồi được lập trình sẵn!',
 };
 
 /**
  * Hàm chuẩn hóa câu hỏi để so sánh với keys trong mockAnswers.
  */
 function normalizeString(str) {
-    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s/g, '');
+    // Sửa lỗi: Bổ sung loại bỏ dấu nháy kép " và dấu chấm hỏi ?
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[?\s"]/g, '');
 }
 
 /**
@@ -1173,33 +1421,22 @@ function prefillAndSend(query) {
     sendMessage();
 }
 
-async function processAI(msg) {
-    const normalizedMsg = normalizeString(msg);
-
-    // 1. Kiểm tra câu hỏi có trong Mock Answers không
-    for (const key in mockAnswers) {
-        if (normalizedMsg.includes(normalizeString(key)) || normalizedMsg === normalizeString(key)) {
-            return mockAnswers[key];
-        }
-    }
-
-    // 2. Phản hồi mặc định nếu không khớp
-    return '🤖 AI: Đây là chế độ mô phỏng. Vui lòng chọn một trong các câu hỏi mẫu về Trần Hưng Đạo để xem phản hồi được lập trình sẵn.';
-}
-
-let isProcessing = false;
-
+/**
+ * KHẮC PHỤC LỖI QUAN TRỌNG: Hàm gửi tin nhắn và xử lý phản hồi mô phỏng AI
+ */
 async function sendMessage() {
     if (isProcessing) return;
 
     const input = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
+    const loader = document.getElementById('loader');
     const msg = input.value.trim();
     if (!msg) return;
 
     isProcessing = true;
     input.disabled = true;
     sendBtn.disabled = true;
+    loader.style.display = 'block';
 
     const chatWindow = document.getElementById('chat-window');
     
@@ -1209,34 +1446,40 @@ async function sendMessage() {
     userDiv.innerText = msg;
     chatWindow.appendChild(userDiv);
     chatWindow.appendChild(document.createElement('div')).style.clear = 'both'; 
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    // Tìm kiếm câu trả lời mô phỏng
+    const normalizedMsg = normalizeString(msg);
+    let responseText = mockAnswers[normalizedMsg] || 'Tôi là Chatbot mô phỏng. Tôi chỉ có thể trả lời các câu hỏi mẫu về Trần Hưng Đạo. Vui lòng thử lại với một trong các gợi ý ở trên!';
 
     try {
         // Mô phỏng độ trễ nhỏ để phản hồi trông tự nhiên hơn
-        await new Promise(resolve => setTimeout(resolve, 500)); 
-
-        const response = await processAI(msg);
+        await new Promise(resolve => setTimeout(resolve, 800)); 
         
         // Thêm tin nhắn AI
         const aiDiv = document.createElement('div');
         aiDiv.className = 'chat-message ai-msg';
-        aiDiv.innerHTML = response; 
+        aiDiv.innerText = responseText; 
         chatWindow.appendChild(aiDiv);
         chatWindow.appendChild(document.createElement('div')).style.clear = 'both'; 
 
     } catch (e) {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'chat-message ai-msg';
-        errorDiv.innerHTML = '🤖 <b>Lỗi:</b> Đã xảy ra lỗi trong quá trình xử lý mô phỏng.';
+        errorDiv.innerText = 'Lỗi: Đã xảy ra lỗi trong quá trình xử lý mô phỏng.';
         chatWindow.appendChild(errorDiv);
         chatWindow.appendChild(document.createElement('div')).style.clear = 'both'; 
+
     } finally {
         isProcessing = false;
         input.disabled = false;
         sendBtn.disabled = false;
+        loader.style.display = 'none';
         chatWindow.scrollTop = chatWindow.scrollHeight;
         input.value = '';
     }
 }
+
 
 /* ==========================================================================
    PHẦN 2: CÁC TÍNH NĂNG CỐT LÕI VÀ GIAO DIỆN
@@ -1248,6 +1491,7 @@ const mockArtifactData = { id: "artifact_123", type: "artifact", name: "Tượng
 const mockArtifactData2 = { id: "artifact_456", type: "artifact", name: "Đài thờ Trà Kiệu", floor: 3, pos: "Văn hóa", model: "dai+tho+tra+kieu.glb", youtubeUrl: "https://youtu.be/G18c1CZdyFk?si=8mQuffOJWBNzAVC" }; 
 
 let currentArtifactData = null; // Biến lưu dữ liệu hiện vật đang hiển thị
+let currentArtifactQuizData = null; // Biến tạm lưu quiz data khi đang làm bài
 let selectedDestinationMarkerId = null;
 
 function showAlert(message) { console.log("[Thông báo]: " + message); }
@@ -1269,11 +1513,33 @@ function showTab(tabId) {
       renderProfileMain(); // Render main view content
       renderProfileHistoryQuiz(); // Pre-render/update sub-view data
   }
+  
+  // Đảm bảo Quiz standalone screen luôn bị ẩn khi chuyển tab
+  document.getElementById('quiz-standalone-screen').classList.add('hidden');
 }
 
-function goToLogin() { document.getElementById('wifi-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); }
-function goToMain() { document.getElementById('login-screen').classList.add('hidden'); document.getElementById('main-screen').classList.remove('hidden'); showTab('intro-tab'); }
-function logout() { document.getElementById('main-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); }
+// ** KHẮC PHỤC LỖI:** Đảm bảo ẩn màn hình cũ và hiện màn hình mới
+function goToLogin() { 
+    document.getElementById('wifi-screen').classList.add('hidden'); 
+    document.getElementById('login-screen').classList.remove('hidden'); 
+    document.getElementById('main-screen').classList.add('hidden'); // Đảm bảo màn hình chính ẩn
+    document.getElementById('quiz-standalone-screen').classList.add('hidden'); // Đảm bảo quiz ẩn
+}
+
+function goToMain() { 
+    document.getElementById('login-screen').classList.add('hidden'); 
+    document.getElementById('main-screen').classList.remove('hidden'); 
+    document.getElementById('wifi-screen').classList.add('hidden'); // Đảm bảo màn hình wifi ẩn
+    document.getElementById('quiz-standalone-screen').classList.add('hidden'); // Đảm bảo quiz ẩn
+    showTab('intro-tab'); 
+}
+
+function logout() { 
+    document.getElementById('main-screen').classList.add('hidden'); 
+    document.getElementById('login-screen').classList.remove('hidden'); 
+    document.getElementById('wifi-screen').classList.add('hidden'); 
+    document.getElementById('quiz-standalone-screen').classList.add('hidden');
+}
 
 // --- QR & CAMERA LOGIC (NÂNG CẤP THỰC TẾ) ---
 async function startCamera() {
@@ -1286,6 +1552,9 @@ async function startCamera() {
   const stopBtn = document.getElementById('stop-button');
   const scannerLine = document.getElementById('scanner-line-wrapper');
   const qrResult = document.getElementById('qr-result');
+
+  // Ẩn Quiz khi bắt đầu quét
+  document.getElementById('quiz-standalone-screen').classList.add('hidden');
 
   qrResult.style.display = 'none';
   placeholder.style.display = 'flex'; placeholder.innerText = 'Đang khởi động Camera...';
@@ -1314,6 +1583,13 @@ async function startCamera() {
     // Bắt đầu vòng lặp quét QR
     videoInterval = setInterval(() => {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            // Cần resize canvas để khớp với video/wrapper size trong vòng lặp
+            const rect = wrapper.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            video.style.width = `${rect.width}px`;
+            video.style.height = `${rect.height}px`;
+
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
             const code = jsQR(imageData.data, imageData.width, imageData.height, {
@@ -1358,6 +1634,15 @@ function mockScanArtifact1() {
     const existing = visitedArtifacts.find(a => a.id === scanData.id);
     if (!existing) {
         visitedArtifacts.push({ id: scanData.id, name: scanData.name });
+        // Khởi tạo trạng thái Quiz nếu chưa có
+        if (!artifactQuizStatus[scanData.id]) {
+            artifactQuizStatus[scanData.id] = { 
+                done: false, 
+                score: 0, 
+                selections: {}, 
+                total: artifactQuizData.length 
+            };
+        }
         showAlert(`Mô phỏng: Quét thành công hiện vật: ${scanData.name}. Đã thêm vào Hồ sơ.`);
     } else {
         showAlert(`Mô phỏng: Quét lại hiện vật: ${scanData.name}. (Đã có trong Hồ sơ).`);
@@ -1373,22 +1658,25 @@ function mockScanArtifact1() {
 }
 
 
-// XÓA HÀM mockScanAlternate (Logic luân phiên không cần thiết và gây nhầm lẫn)
-
 function handleScanSuccess(json) {
   try {
       const data = JSON.parse(json);
       currentArtifactData = data; // Lưu dữ liệu quét vào biến toàn cục
+      currentArtifactQuizData = null; // Reset quiz data tạm thời
       
       const titleEl = document.getElementById('data-title');
       const detailsEl = document.getElementById('scanned-details');
       const youtubeBtn = document.getElementById('youtube-button');
       const view360Btn = document.getElementById('view360-button');
+      const startQuizBtn = document.getElementById('start-quiz-button-qr');
       
       // Reset interaction buttons & viewers
       youtubeBtn.style.display = 'none'; view360Btn.style.display = 'none';
       document.getElementById('artifact-360-display').style.display = 'none';
       document.getElementById('video-container').style.display = 'none'; 
+      
+      // Ẩn Quiz Standalone Screen
+      document.getElementById('quiz-standalone-screen').classList.add('hidden');
       
       if (data.type === 'artifact' && data.name) {
         // Đây là hiện vật -> HIỂN THỊ THÔNG TIN
@@ -1404,11 +1692,21 @@ function handleScanSuccess(json) {
         if (data.id === 'artifact_123' || data.id === 'artifact_456') {
             view360Btn.style.display = 'inline-block';
         }
+        
+        // Hiện nút Quiz nếu có Quiz cho hiện vật này
+        if (getQuizForArtifact(data.id)) {
+            startQuizBtn.style.display = 'inline-block';
+        } else {
+            startQuizBtn.style.display = 'none';
+        }
+        
         showAlert(`Quét thành công: ${data.name}`);
+        
       } else {
         // KHÔNG PHẢI HIỆN VẬT -> HIỂN THỊ THÔNG BÁO LỖI/CHUNG
         titleEl.innerText = "Kết quả quét";
         detailsEl.innerText = "Dữ liệu không phải là hiện vật (Ví dụ: Mã vé đã được xử lý lúc Đăng nhập).";
+        startQuizBtn.style.display = 'none';
       }
       document.getElementById('qr-result').style.display = 'flex';
       
@@ -1435,6 +1733,9 @@ function playVideoPresentation() {
         // Mở URL YouTube trong tab mới
         window.open(currentArtifactData.youtubeUrl, '_blank');
         showAlert(`Đang mở video thuyết minh trên YouTube: ${currentArtifactData.youtubeUrl}`);
+        
+        // LOGIC KÍCH HOẠT QUIZ BỊ XÓA (giờ là nút Bắt đầu)
+        
     } else {
         showAlert("Lỗi: Không tìm thấy liên kết YouTube.");
     }
@@ -1473,6 +1774,8 @@ function view360() {
     `;
     
     showAlert(`Đã tải khung nhìn 3D/AR ${artifactName}.`);
+    
+    // LOGIC KÍCH HOẠT QUIZ BỊ XÓA (giờ là nút Bắt đầu)
 }
 
 /* ==========================================================================
@@ -1507,6 +1810,19 @@ const floorData = {
 };
 let activeFilters = { display:true, toilet:true, info:true, current:true };
 
+function toggleFilter(type) {
+    activeFilters[type] = !activeFilters[type];
+    const filterEl = document.getElementById(`filter-${type}`);
+    if(filterEl) {
+        filterEl.classList.toggle('active', activeFilters[type]);
+    }
+    
+    // Ẩn/hiện các marker tương ứng
+    document.querySelectorAll(`.marker-${type}`).forEach(el => {
+        el.style.display = activeFilters[type] ? 'block' : 'none';
+    });
+}
+
 function updateDestinationOptions(floor) {
     const destSelect = document.getElementById('destination-select');
     destSelect.innerHTML = '<option value="" selected>Chọn điểm đến...</option>';
@@ -1525,7 +1841,17 @@ function updateDestinationOptions(floor) {
 
 function selectDestination(markerId) {
     selectedDestinationMarkerId = markerId;
-    document.getElementById('destination-select').value = markerId;
+    const destSelect = document.getElementById('destination-select');
+
+    // KHẮC PHỤC LỖI: Đảm bảo markerId tồn tại trong danh sách options của select
+    const optionExists = Array.from(destSelect.options).some(opt => opt.value === markerId);
+    if (optionExists) {
+        destSelect.value = markerId;
+    } else {
+        // Nếu markerId không thuộc tầng hiện tại, chỉ highlight và không set select
+        // Hoặc có thể không làm gì cả nếu marker không thuộc tầng hiện tại.
+        // Để đơn giản, chỉ xử lý highlight nếu marker đó đang hiển thị
+    }
 
     // Highlight marker
     document.querySelectorAll('.map-marker').forEach(el => el.classList.remove('marker-selected'));
@@ -1533,6 +1859,9 @@ function selectDestination(markerId) {
     if (selectedMarker) {
         selectedMarker.classList.add('marker-selected');
         showAlert(`Đã chọn: ${selectedMarker.title} làm điểm đến.`);
+        
+        // TỰ ĐỘNG GỌI findPath() sau khi chọn điểm đến
+        findPath();
     }
 }
 
@@ -1554,6 +1883,7 @@ function changeFloor() {
       
       // Thêm sự kiện click để chọn điểm đến
       if (m.type !== 'current') {
+          // Đã sửa: Hàm selectDestination sẽ tự động gọi findPath()
           el.onclick = () => selectDestination(m.id);
       }
 
@@ -1564,12 +1894,6 @@ function changeFloor() {
   const line = document.getElementById('path-line');
   line.style.display='none'; line.classList.remove('path-active');
   showAlert(`Đã chuyển sang Tầng ${f}`);
-}
-
-function toggleFilter(t) {
-  activeFilters[t] = !activeFilters[t];
-  document.getElementById(`filter-${t}`).classList.toggle('active');
-  document.querySelectorAll(`.map-marker[data-type="${t}"]`).forEach(e => e.style.display = activeFilters[t] ? 'block' : 'none');
 }
 
 function findPath() {
@@ -1588,9 +1912,10 @@ function findPath() {
     if (currentFloor !== endFloor) {
         showAlert(`Đang chuyển về Tầng ${endFloor} để tìm đường...`);
         document.getElementById('floor-select').value = endFloor;
-        changeFloor(); 
+        // Bắt sự kiện onchange để gọi changeFloor()
+        document.getElementById('floor-select').dispatchEvent(new Event('change'));
         
-        // Cần chờ DOM cập nhật sau khi gọi changeFloor
+        // Cần chờ DOM cập nhật sau khi gọi changeFloor (dù đã gọi changeFloor() qua event, vẫn cần độ trễ)
         setTimeout(() => {
              const newStart = document.getElementById('pos-current');
              const newEnd = document.getElementById(destinationId);
@@ -1614,13 +1939,22 @@ function _drawPath(startEl, endEl) {
     const endX = endEl.offsetLeft + (endEl.offsetWidth / 2);
     const endY = endEl.offsetTop + (endEl.offsetHeight / 2);
 
-    const dx = endX - startX; const dy = endY - startY;
+    const dx = endX - startX;
+    const dy = endY - startY;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+    
+    // Math.atan2(dx, dy) tính góc xoay theo chiều kim đồng hồ so với trục Y dương (hướng xuống).
+    const angleRad = Math.atan2(dx, dy); 
+    const angle = angleRad * 180 / Math.PI; // Chuyển sang độ
 
     pathLine.style.transformOrigin = `top center`;
+    // Đặt transform để xoay theo góc mới
     pathLine.style.transform = `rotate(${angle}deg)`;
-    pathLine.style.top = `${startY}px`; pathLine.style.left = `${startX - 2.5}px`; 
+    
+    // Đặt vị trí bắt đầu là tâm của marker bắt đầu
+    pathLine.style.top = `${startY}px`; 
+    pathLine.style.left = `${startX - 2.5}px`; // Trừ 2.5 để căn giữa (vì width là 5px)
+    
     pathLine.style.height = '0px'; 
     pathLine.style.transition = 'none'; pathLine.style.display = 'block';
 
@@ -1643,13 +1977,15 @@ function resetMap() {
         const filterEl = document.getElementById(`filter-${t}`);
         if(filterEl) filterEl.classList.add('active'); 
     });
+    // Gọi changeFloor để tải lại bản đồ với filter reset
     changeFloor();
 }
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     // Không cần loadKnowledgeBase nữa
-    setTimeout(changeFloor, 100);
+    // Khởi tạo changeFloor sau một chút độ trễ để đảm bảo DOM đã sẵn sàng
+    setTimeout(changeFloor, 100); 
     renderProfile(); // Khởi tạo lần đầu
     updateProfileDisplay(); // Đảm bảo profile hiển thị đúng
 });
