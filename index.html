@@ -387,12 +387,30 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
 @keyframes path-glow { from { opacity: 0.8; } to { opacity: 1; } }
 
 .map-filters {
-    display: flex; justify-content: space-around; align-items: center; width: 95%;
-    background: var(--bg-card); padding: 10px 0; border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #eee;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 95%;
+    background: var(--bg-card);
+    padding: 10px 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+    border: 1px solid #eee;
 }
-.filter-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0.6; font-size: 12px; }
-.filter-item.active { opacity: 1; font-weight: 600; transform: scale(1.05); }
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0.6;
+    font-size: 12px;
+}
+.filter-item.active {
+    opacity: 1;
+    font-weight: 600;
+    transform: scale(1.05);
+}
 .filter-item span { font-size: 20px; }
 
 /* Lang */
@@ -400,6 +418,68 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
 #lang-options { position: absolute; top: 70px; right: 35px; display: none; flex-direction: column; z-index: 101; background: white; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); padding: 5px; min-width: 150px; }
 #lang-options button { margin: 0; padding: 8px 10px; width: 100%; text-align: left; background: none; color: #333; font-size: 14px; box-shadow: none; border-radius: 8px; }
 #lang-options button:hover { background: var(--nav-active-bg); color: var(--primary-dark); }
+
+/* NEW: Sub-Tab Navigation for Profile */
+.sub-nav {
+    display: flex;
+    justify-content: space-around;
+    width: 95%;
+    margin-bottom: 15px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.sub-nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #7f8c8d;
+    transition: all 0.2s;
+}
+.sub-nav-item.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 10px rgba(46, 204, 113, 0.4);
+    font-weight: 600;
+}
+
+/* NEW: Containers for sub-tabs */
+.sub-tab-content {
+    display: none;
+    width: 95%;
+    text-align: left;
+    animation: fadeIn 0.3s ease-out;
+}
+.sub-tab-content.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* NEW: Styling for the Profile Info Block to look like a button */
+.profile-info-block {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 15px;
+    width: 95%;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border: 1px solid #ddd;
+    cursor: pointer; /* Thêm cursor pointer để trông giống nút */
+    transition: background-color 0.2s;
+}
+.profile-info-block:hover {
+    background-color: #f0f0f0;
+}
+
 </style>
 </head>
 <body>
@@ -497,7 +577,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
         <button id="stop-button" onclick="stopCamera()" style="display: none; flex: 1; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">Ngừng Camera</button>
       </div>
 
-      <!-- Xóa nút mockScanAlternate cũ và giữ lại mockScanArtifact1 -->
+      <!-- Nút mô phỏng nhanh Hiện vật Trần Hưng Đạo -->
       <button onclick="mockScanArtifact1()" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); width: 95%; margin-top: 10px; padding: 10px 25px; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">
           ⚡ Xem Hiện vật mẫu: Tượng Trần Hưng Đạo
       </button>
@@ -564,17 +644,44 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
       
       <!-- NEW: Profile Main View -->
       <div id="profile-main-view" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-          <div class="info-card" style="text-align: center; border-left: 5px solid var(--accent-color);">
-            <p>Mã vé: <b>123456</b></p>
-            <p>Họ tên: <b>Nguyễn Văn A</b></p>
-            <p>Thời gian: 14:30 15/07/2025</p>
+          
+          <!-- THẺ THÔNG TIN CÁ NHÂN (CÓ THỂ NHẤN VÀO để toggle chỉnh sửa) -->
+          <div class="profile-info-block" id="profile-info-card" onclick="toggleEditProfile()">
+             <div id="profile-view-mode">
+                 <div style="font-size: 18px; font-weight: 700; color: var(--primary-dark); margin-bottom: 5px;">
+                     Mã vé: <span style="color: var(--accent-color);">123456</span>
+                 </div>
+                 <p style="text-align: center; margin: 2px 0;">Họ tên: <b id="display-username">Nguyễn Văn A</b></p>
+                 <p style="text-align: center; margin: 2px 0; font-size: 12px; color: #7f8c8d;">Thời gian: 14:30 15/07/2025</p>
+                 <button onclick="event.stopPropagation(); toggleEditProfile();" style="padding: 8px 15px; font-size: 14px; margin-top: 10px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);">
+                     ⚙️ Sửa Hồ sơ
+                 </button>
+             </div>
+             
+             <div id="profile-edit-mode" style="display:none; text-align: center;">
+                 <h4 style="margin-top: 0;">Chỉnh sửa Hồ sơ</h4>
+                 <label for="edit-username" style="font-size: 14px; display: block; margin-bottom: 5px;">Họ tên:</label>
+                 <input type="text" id="edit-username" placeholder="Nhập tên mới" style="width: 80%; margin-bottom: 10px; padding: 8px;">
+                 <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button onclick="event.stopPropagation(); saveProfile();" style="flex: 1; padding: 10px 15px; font-size: 14px;">
+                        💾 Lưu
+                    </button>
+                    <button onclick="event.stopPropagation(); toggleEditProfile();" style="flex: 1; padding: 10px 15px; font-size: 14px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                        ❌ Hủy
+                    </button>
+                 </div>
+             </div>
+
           </div>
 
-          <div class="info-card achievement-card">
+          <!-- PHẦN THƯỞNG ĐƯỢC NÂNG CẤP -->
+          <div class="info-card achievement-card" id="reward-card">
             <h4>🏆 Thành tích Quizz & Phần thưởng</h4>
             <p>Điểm Quiz: <b id="quiz-score">0</b>/3</p>
-            <p id="reward-status">Hoàn thành Quiz để nhận phần thưởng!</p>
-            <button onclick="checkRewardStatus()">Kiểm tra Phần thưởng</button>
+            <div id="reward-status-display">
+                <!-- Nội dung được cập nhật bằng JS -->
+                <p id="reward-status">Hoàn thành Quiz để nhận phần thưởng hấp dẫn!</p>
+            </div>
           </div>
           
           <!-- NEW: Button to trigger the History/Quiz sub-screen -->
@@ -591,41 +698,58 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
               ⬅️ Quay lại Hồ sơ
           </button>
           
+          <!-- SUB-NAVIGATION BAR (MỚI) -->
+          <div class="sub-nav">
+              <div class="sub-nav-item active" onclick="showSubTab('history')">📍 Lịch sử Q.R</div>
+              <!-- ĐÃ XÓA: <div class="sub-nav-item" onclick="showSubTab('reward')">🎁 Lịch sử Thưởng</div> -->
+              <div class="sub-nav-item" onclick="showSubTab('quiz')">❓ Mini Quiz</div>
+          </div>
+          
           <!-- Old Combined Card Content -->
-          <div class="info-card" id="history-quiz-combined-area" style="border-left: 5px solid var(--primary-dark); padding: 0;">
+          <div class="info-card" id="history-quiz-combined-area" style="border-left: 5px solid var(--primary-dark); padding: 0; width: 95%;">
             
-            <!-- History Section -->
-            <div style="padding: 15px 15px 5px 15px;">
-                <h4>📍 Địa điểm đã tham quan (Quét QR)</h4>
-                <ul id="visited-locations" style="list-style-type: disc; margin-left: 15px; margin-bottom: 5px;">
-                  <!-- Items added via JS -->
-                  <li>(Chưa có)</li>
-                </ul>
+            <!-- History Section (TAB 1) -->
+            <div id="sub-tab-history" class="sub-tab-content active">
+                <div style="padding: 15px;">
+                    <h4>📍 Địa điểm đã tham quan (Quét QR)</h4>
+                    <ul id="visited-locations" style="list-style-type: disc; margin-left: 15px; margin-bottom: 5px;">
+                      <!-- Items added via JS -->
+                      <li>(Chưa có)</li>
+                    </ul>
+                </div>
             </div>
+            
+            <!-- ĐÃ XÓA: Reward History Section (TAB 2) -->
+            <!-- Loại bỏ div id="sub-tab-reward" -->
 
-            <!-- Quiz Section -->
-            <div id="quiz-area" style="padding: 10px 15px 15px 15px; border-top: 1px solid #eee;">
-                <h4>❓ Mini Quiz Hiện vật</h4>
-                <!-- MỚI: Trạng thái mở khóa quiz -->
-                <div id="quiz-unlock-status" style="margin-bottom: 10px; font-weight: 500; padding: 10px; border-radius: 8px; text-align: center;">
-                    <!-- Nội dung được cập nhật bằng JS -->
-                </div>
-                <!-- MỚI: Banner hình ảnh cho quiz -->
-                <div id="quiz-banner" style="display:none; margin-bottom: 15px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                    <img id="quiz-banner-img" src="https://placehold.co/350x150/2c3e50/ffffff?text=QUIZ+VỀ+TƯỢNG+ĐÀI+LỊCH+SỬ" alt="Quiz Banner" style="width: 100%; height: auto; display: block;">
-                </div>
-                <!-- MỚI: Loader giả lập -->
-                <div id="quiz-loader" style="text-align: center; display:none; padding: 20px;">
-                    <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block;"></div>
-                    <p style="margin-top: 10px; color: var(--primary-dark);">Đang tải Quiz... Chuẩn bị sẵn sàng!</p>
-                </div>
+            <!-- Quiz Section (TAB 3) -->
+            <div id="sub-tab-quiz" class="sub-tab-content">
+                <div id="quiz-area" style="padding: 10px 15px 15px 15px;">
+                    <h4>❓ Mini Quiz Hiện vật</h4>
+                    <!-- NÚT START QUIZ MỚI (ĐƯỢC DI CHUYỂN LÊN ĐẦU) -->
+                    <button id="quiz-start-button" onclick="startQuiz()" style="width:100%; margin: 5px 0 15px 0;">Bắt đầu Quiz</button>
 
-                <div id="quiz-question-container">
-                    <!-- Questions added via JS -->
+                    <!-- MỚI: Trạng thái mở khóa quiz -->
+                    <div id="quiz-unlock-status" style="margin-bottom: 10px; font-weight: 500; padding: 10px; border-radius: 8px; text-align: center;">
+                        <!-- Nội dung được cập nhật bằng JS -->
+                    </div>
+                    <!-- MỚI: Banner hình ảnh cho quiz -->
+                    <div id="quiz-banner" style="display:none; margin-bottom: 15px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        <img id="quiz-banner-img" src="https://placehold.co/350x150/2c3e50/ffffff?text=QUIZ+VỀ+TƯỢNG+ĐÀI+LỊCH+SỬ" alt="Quiz Banner" style="width: 100%; height: auto; display: block;">
+                    </div>
+                    <!-- MỚI: Loader giả lập -->
+                    <div id="quiz-loader" style="text-align: center; display:none; padding: 20px;">
+                        <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block;"></div>
+                        <p style="margin-top: 10px; color: var(--primary-dark);">Đang tải Quiz... Chuẩn bị sẵn sàng!</p>
+                    </div>
+
+                    <div id="quiz-question-container">
+                        <!-- Questions added via JS -->
+                    </div>
+                    <button id="quiz-submit-button" onclick="submitQuiz()" style="display:none; width:100%; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">Hoàn thành Quiz</button>
                 </div>
-                <button id="quiz-submit-button" onclick="submitQuiz()" style="display:none; width:100%; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">Hoàn thành Quiz</button>
-                <button id="quiz-start-button" onclick="startQuiz()" style="width:100%;">Bắt đầu Quiz</button>
             </div>
+            
           </div>
           
       </div>
@@ -646,13 +770,62 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
 
 <script>
 /* ==========================================================================
-   DỮ LIỆU GAMEFICATION (MỚI)
+   DỮ LIỆU CÁ NHÂN (MỚI)
+   ========================================================================== */
+let profileData = {
+    ticket: "123456",
+    username: "Nguyễn Văn A",
+    time: "14:30 15/07/2025"
+};
+let isEditingProfile = false;
+
+// Hàm cập nhật thông tin hiển thị của profile
+function updateProfileDisplay() {
+    document.getElementById('display-username').innerText = profileData.username;
+    document.getElementById('edit-username').value = profileData.username;
+}
+
+// Hàm chuyển đổi chế độ chỉnh sửa
+function toggleEditProfile() {
+    isEditingProfile = !isEditingProfile;
+    const viewMode = document.getElementById('profile-view-mode');
+    const editMode = document.getElementById('profile-edit-mode');
+    
+    if (isEditingProfile) {
+        viewMode.style.display = 'none';
+        editMode.style.display = 'block';
+    } else {
+        viewMode.style.display = 'block';
+        editMode.style.display = 'none';
+        // Đảm bảo input có giá trị hiện tại khi hủy
+        document.getElementById('edit-username').value = profileData.username;
+    }
+}
+
+// Hàm lưu hồ sơ
+function saveProfile() {
+    const newUsername = document.getElementById('edit-username').value.trim();
+    if (newUsername.length > 0) {
+        profileData.username = newUsername;
+        updateProfileDisplay();
+        toggleEditProfile(); // Thoát chế độ chỉnh sửa
+        showAlert("Đã lưu Hồ sơ thành công!");
+    } else {
+        showAlert("Tên không được để trống!");
+    }
+}
+
+/* ==========================================================================
+   DỮ LIỆU GAMEFICATION 
    ========================================================================== */
 let visitedArtifacts = []; // Array of { id: string, name: string }
 let quizScore = 0;
+
 const REWARD_THRESHOLD = 3; 
-// MỚI: Số hiện vật tối thiểu cần tham quan để mở Quiz
-const MIN_ARTIFACTS_FOR_QUIZ = 2; 
+// ĐÃ SỬA: Số hiện vật tối thiểu cần tham quan để mở Quiz là 1
+const MIN_ARTIFACTS_FOR_QUIZ = 1; 
+// MỚI: Mã đổi thưởng (Dù không lưu lịch sử, vẫn cần mã này để hiển thị)
+const REWARD_CODE = "DN-BTM-10FF-2025"; 
 
 // Dữ liệu Quiz cố định
 const miniQuizData = [
@@ -697,6 +870,10 @@ function showProfileSubScreen(viewId) {
     const targetView = document.getElementById(viewId);
     if (targetView) {
         targetView.style.display = 'flex';
+        // Mặc định hiển thị tab lịch sử khi vào màn hình phụ
+        if (viewId === 'artifact-history-quiz-view') {
+            showSubTab('history');
+        }
     }
 }
 
@@ -711,26 +888,51 @@ function backToProfileMain() {
     renderProfileMain(); 
 }
 
+/**
+ * NEW FUNCTION: Quản lý việc chuyển đổi giữa các tab phụ (History, Quiz)
+ */
+function showSubTab(tabId) {
+    // Ẩn tất cả nội dung tab
+    document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
+    // Xóa active khỏi tất cả nút
+    document.querySelectorAll('.sub-nav-item').forEach(el => el.classList.remove('active'));
+
+    // Hiển thị nội dung tab được chọn
+    document.getElementById(`sub-tab-${tabId}`).classList.add('active');
+    // Đánh dấu nút đang hoạt động
+    document.querySelector(`.sub-nav-item[onclick*="'${tabId}'"]`).classList.add('active');
+    
+    // Logic đặc biệt cho tab Quiz
+    if (tabId === 'quiz') {
+        renderProfileHistoryQuiz(true); // Chỉ render Quiz Status khi vào tab Quiz
+    }
+}
+
 function renderProfileMain() {
     // Only update score/reward status on the main card
     const scoreEl = document.getElementById('quiz-score');
     scoreEl.innerText = `${quizScore}/${miniQuizData.length}`;
-    checkRewardStatus();
+    checkRewardStatus(); // Vẫn cần gọi để cập nhật thẻ thưởng trên màn hình chính
+    updateProfileDisplay(); // Cập nhật tên người dùng
 }
 
-function renderProfileHistoryQuiz() {
+function renderProfileHistoryQuiz(isQuizTabActive = false) {
     const visitedList = document.getElementById('visited-locations');
+    // ĐÃ XÓA: const rewardList = document.getElementById('reward-history-list');
     const quizStartBtn = document.getElementById('quiz-start-button');
     const quizUnlockStatus = document.getElementById('quiz-unlock-status');
     const quizBanner = document.getElementById('quiz-banner');
     const quizLoader = document.getElementById('quiz-loader');
+    const quizContainer = document.getElementById('quiz-question-container');
     
     // 1. Cập nhật danh sách đã tham quan
     visitedList.innerHTML = visitedArtifacts.length > 0
         ? visitedArtifacts.map(a => `<li>🖼️ ${a.name} (${a.id})</li>`).join('')
         : '<li>(Chưa có)</li>';
+        
+    // 2. ĐÃ XÓA LOGIC CẬP NHẬT LỊCH SỬ ĐỔI THƯỞNG
 
-    // 2. KIỂM TRA ĐIỀU KIỆN MỞ KHÓA QUIZ
+    // 3. KIỂM TRA ĐIỀU KIỆN MỞ KHÓA QUIZ
     const visitedCount = visitedArtifacts.length;
     const isQuizUnlocked = visitedCount >= MIN_ARTIFACTS_FOR_QUIZ;
     
@@ -749,18 +951,31 @@ function renderProfileHistoryQuiz() {
         quizStartBtn.style.opacity = 0.5;
     }
     
-    // 3. Reset Quiz UI
+    // 4. Reset Quiz Data (Chỉ reset trạng thái làm bài, không reset điểm)
     miniQuizData.forEach(q => {
         if (q.selectedOptionIndex === undefined) q.selectedOptionIndex = null;
         if (q.submitted === undefined) q.submitted = false;
     });
 
-    // Chỉ render quiz questions nếu chưa ở chế độ submit/đang làm
-    if (document.getElementById('quiz-submit-button').style.display === 'none') {
-        renderQuizQuestions(false); 
-        quizBanner.style.display = 'none'; // Ẩn banner khi không làm quiz
+    // 5. Quản lý hiển thị UI trong Tab Quiz
+    if (isQuizTabActive) {
+        // Mặc định ẩn container câu hỏi, banner, và nút nộp
+        quizContainer.style.display = 'none';
+        quizBanner.style.display = 'none';
         quizLoader.style.display = 'none';
-        document.getElementById('quiz-question-container').style.display = 'block';
+        document.getElementById('quiz-submit-button').style.display = 'none';
+        
+        // Luôn hiển thị nút Bắt đầu Quiz khi mới vào màn hình (nếu đã mở khóa)
+        quizStartBtn.style.display = 'inline-block';
+
+        // Nếu người dùng đã nộp bài (để xem lại kết quả), hiển thị lại kết quả
+        if (miniQuizData.some(q => q.submitted)) {
+            quizContainer.style.display = 'block';
+            renderQuizQuestions(false); // Render kết quả đã nộp (non-interactive)
+        } else {
+            // Nếu chưa làm hoặc đã reset, đảm bảo container câu hỏi trống
+            quizContainer.innerHTML = '';
+        }
     }
 }
 
@@ -883,23 +1098,45 @@ function submitQuiz() {
     document.getElementById('quiz-submit-button').style.display = 'none';
     document.getElementById('quiz-start-button').style.display = 'inline-block';
     
-    showAlert(`Bạn đã hoàn thành Quiz với ${quizScore}/${miniQuizData.length} điểm!`);
+    // CẬP NHẬT: THÔNG BÁO NHẬN THƯỞNG NGAY LẬP TỨC 
+    const requiredCorrect = REWARD_THRESHOLD;
+    if (quizScore >= requiredCorrect) {
+        // LƯU LỊCH SỬ NHẬN THƯỞNG (ĐÃ XÓA LOGIC LƯU VÀO rewardHistory)
+
+        showAlert(`🎉 CHÚC MỪNG! Bạn đã đạt ${quizScore}/${miniQuizData.length} điểm và nhận được Phiếu giảm giá 10%!`);
+    } else {
+        showAlert(`Bạn đã hoàn thành Quiz với ${quizScore}/${miniQuizData.length} điểm!`);
+    }
 }
 
+// HÀM NÂNG CẤP PHẦN THƯỞNG
 function checkRewardStatus() {
     const statusEl = document.getElementById('reward-status');
+    const displayEl = document.getElementById('reward-status-display');
     const totalCorrect = miniQuizData.length;
     const requiredCorrect = REWARD_THRESHOLD; // Cần 3/3 điểm để nhận thưởng
 
     if (quizScore >= requiredCorrect) {
-        statusEl.innerHTML = `🎉 **Chúc mừng!** Bạn đã nhận được **Phiếu giảm giá 10%** tại cửa hàng lưu niệm.`;
-        statusEl.style.color = 'var(--primary-dark)'; 
-        statusEl.style.fontWeight = 'bold';
+        // HIỂN THỊ MÃ ĐỔI THƯỞNG VÀ QR CODE GIẢ LẬP
+        const code = REWARD_CODE;
+        const qrPlaceholder = `https://placehold.co/100x100/27ae60/ffffff?text=CODE`;
+
+        displayEl.innerHTML = `
+            <p style="color: var(--primary-dark); font-weight: bold; font-size: 16px; margin-bottom: 8px;">
+                🎉 **Đã Nhận Thưởng!**
+            </p>
+            <p style="color: var(--primary-dark);">Bạn đã nhận được Phiếu giảm giá **10%**.</p>
+            <p style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">Mã đổi thưởng: <b style="color: #e67e22;">${code}</b>. Xuất trình mã này tại quầy.</p>
+        `;
+        document.getElementById('reward-card').style.borderLeft = '5px solid var(--accent-color)';
     } else {
+        // HIỂN THỊ THÔNG BÁO THIẾU ĐIỂM
         const missing = requiredCorrect - quizScore;
-        statusEl.innerHTML = `Hoàn thành ${requiredCorrect}/${totalCorrect} câu đúng để nhận quà! Bạn cần đúng thêm ${missing} câu nữa.`;
-        statusEl.style.color = '#e67e22';
-        statusEl.style.fontWeight = 'normal';
+        displayEl.innerHTML = `
+            <p id="reward-status">Hoàn thành ${requiredCorrect}/${totalCorrect} câu đúng để nhận quà!</p>
+            <p style="color: #e67e22; font-weight: 500;">Bạn cần đúng thêm ${missing} câu nữa.</p>
+        `;
+         document.getElementById('reward-card').style.borderLeft = '5px solid var(--primary-dark)';
     }
 }
 
@@ -1414,6 +1651,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Không cần loadKnowledgeBase nữa
     setTimeout(changeFloor, 100);
     renderProfile(); // Khởi tạo lần đầu
+    updateProfileDisplay(); // Đảm bảo profile hiển thị đúng
 });
 
 // Lang
