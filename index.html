@@ -385,23 +385,32 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
     transition: transform 0.3s, opacity 0.3s; filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.4));
 }
 .map-marker:hover { transform: scale(1.2); z-index: 20; }
+.marker-label {
+    position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.9); padding: 2px 6px; border-radius: 8px;
+    font-size: 9px; font-weight: 700; white-space: nowrap; color: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
 .marker-current { color: #3498db; animation: pulse-dot 1.5s infinite ease-out; font-size: 30px; }
 @keyframes pulse-dot { 0% { transform: scale(0.8); opacity: 0.9; } 50% { transform: scale(1.1); opacity: 0.6; } 100% { transform: scale(0.8); opacity: 0.9; } }
 .marker-toilet { color: #e74c3c; } 
 .marker-display { color: var(--accent-color); } 
 .marker-info { color: var(--primary-dark); } 
 
-.marker-selected {
-    box-shadow: 0 0 0 5px rgba(243, 156, 18, 0.5); 
-    border-radius: 50%;
-}
-
 #path-line {
-    position: absolute; width: 5px; background: linear-gradient(to bottom, var(--primary-dark), #3498db);
-    box-shadow: 0 0 15px rgba(46, 204, 113, 0.7); border-radius: 3px; z-index: 10; pointer-events: none; display: none;
+    position: absolute; 
+    height: 4px; 
+    background: linear-gradient(90deg, #3498db, var(--primary-color));
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5); 
+    border-radius: 4px; 
+    z-index: 10; 
+    pointer-events: none; 
+    display: none;
+    transform-origin: 0 50%;
+    animation: path-glow 1s infinite alternate;
 }
-.path-active { animation: path-glow 0.8s infinite alternate; }
-@keyframes path-glow { from { opacity: 0.8; } to { opacity: 1; } }
+@keyframes path-glow { from { opacity: 0.6; } to { opacity: 1; } }
 
 .map-filters {
     display: flex;
@@ -583,19 +592,24 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
   <div class="screen hidden" id="main-screen">
     <input type="text" id="search-input" placeholder="🔍 Tìm khu trưng bày, hiện vật..." style="width:95%; margin:5px 0 10px; padding:10px; border-radius:12px; border:1px solid #ccc;">
 
-    <!-- Intro Tab -->
+    <!-- NÂNG CẤP PHẦN GIỚI THIỆU TÍNH NĂNG APP -->
     <div class="tab-content active-tab" id="intro-tab">
-      <h3>🏛️ Thông tin Chung</h3>
+      <h3>🏛️ Khám phá Ứng dụng</h3>
       <div class="info-card">
-        <h4>1. Giờ mở cửa & Giá vé</h4>
-        <p>Mở cửa: 7:30 - 17:00 hàng ngày.</p>
-        <p>Giá vé: 40.000đ (Người lớn), 20.000đ (Sinh viên).</p>
+        <h4>🤖 Trợ lý AI Thông minh</h4>
+        <p>Hỗ trợ giải đáp mọi thắc mắc về lịch sử và văn hóa Bảo tàng Đà Nẵng thông qua kết nối trực tiếp với Gemini AI.</p>
       </div>
-      <div class="info-card">
-        <h4>2. Sơ đồ tham quan</h4>
-        <p>Tầng 1: Tiền sử & Cổ vật.</p>
-        <p>Tầng 2: Lịch sử chiến tranh.</p>
-        <p>Tầng 3: Văn hóa & Dân tộc học.</p>
+      <div class="info-card" style="border-left-color: #3498db;">
+        <h4>📷 Thuyết minh & 3D/AR</h4>
+        <p>Quét mã QR tại hiện vật để nghe thuyết minh tự động và quan sát mô hình 3D thực tế ảo sống động ngay trên điện thoại.</p>
+      </div>
+      <div class="info-card" style="border-left-color: #e74c3c;">
+        <h4>🗺️ Bản đồ Dẫn đường</h4>
+        <p>Hệ thống sơ đồ thực tế tích hợp GPS nội bộ giúp bạn dễ dàng định vị và tìm lộ trình ngắn nhất đến các khu trưng bày.</p>
+      </div>
+      <div class="info-card" style="border-left-color: #9b59b6;">
+        <h4>🏆 Thử thách & Phần thưởng</h4>
+        <p>Tham gia trả lời các câu hỏi Quiz sau khi tham quan hiện vật để tích lũy điểm thành tích và nhận các phần quà hấp dẫn.</p>
       </div>
     </div>
 
@@ -671,15 +685,17 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
     <!-- Map Tab -->
     <div class="tab-content" id="map-tab">
       <h3>🗺️ Bản đồ & Hướng dẫn</h3>
-      <select id="floor-select" onchange="changeFloor()" style="margin-bottom:15px; padding: 10px; border-radius: 10px; width: 95%;">
-        <option value="1">Tầng 1 - Cổ vật & Tiếp đón</option>
-        <option value="2">Tầng 2 - Lịch sử & Kháng chiến</option>
-        <option value="3">Tầng 3 - Văn hóa & Phát triển</option>
-      </select>
-      
-      <select id="destination-select" style="margin-bottom:15px; padding: 10px; border-radius: 10px; width: 95%;">
-        <option value="" selected>Chọn điểm đến...</option>
-      </select>
+      <div style="display: flex; flex-direction: column; width: 95%; gap: 10px; margin-bottom: 15px;">
+        <select id="floor-select" onchange="changeFloor()" style="margin-bottom:0; padding: 10px; border-radius: 10px; width: 100%;">
+          <option value="1">Tầng 1 - Cổ vật & Tiếp đón</option>
+          <option value="2">Tầng 2 - Lịch sử & Kháng chiến</option>
+          <option value="3">Tầng 3 - Văn hóa & Phát triển</option>
+        </select>
+        
+        <select id="destination-select" style="margin-bottom:0; padding: 10px; border-radius: 10px; width: 100%;">
+          <option value="" selected>Chọn điểm đến...</option>
+        </select>
+      </div>
       
       <div class="map-filters">
         <div class="filter-item active" id="filter-display" onclick="toggleFilter('display')"><span>🖼️</span>Trưng bày</div>
@@ -696,7 +712,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
         <button onclick="findPath()" style="flex: 1; background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);">➡️ Dẫn đường</button>
         <button onclick="resetMap()" style="flex: 1; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);">🔄 Đặt lại</button>
       </div>
-      <div id="ai-guide" style="background: linear-gradient(45deg, var(--primary-color), #4d89ff); color: white; padding: 12px; width: 95%; border-radius: 12px; font-size: 14px; margin-top: 15px;">🤖 Gợi ý: Tầng 1 đang đông khách.</div>
+      <div id="ai-guide" style="background: linear-gradient(45deg, var(--primary-color), #4d89ff); color: white; padding: 12px; width: 95%; border-radius: 12px; font-size: 14px; margin-top: 15px;">🤖 Gợi ý: Tầng 1 đang có triển lãm Gốm sứ cổ.</div>
     </div>
 
     <!-- Profile Tab -->
@@ -1290,6 +1306,10 @@ function showTab(tabId) {
       }
       startCamera();
   }
+
+  if (tabId === 'map-tab') {
+      setTimeout(changeFloor, 100);
+  }
 }
 
 /**
@@ -1484,33 +1504,147 @@ function exitSubView() {
 }
 
 /* ==========================================================================
-   MAP LOGIC
+   UPGRADED MAP LOGIC
    ========================================================================== */
 const floorData = {
-    1: { bg: "https://placehold.co/400x300/a2d9ce/000000?text=TANG+1", markers: [{id:'p1', type:'current', top:'70%', left:'50%', title:'Bạn'}] },
-    2: { bg: "https://placehold.co/400x300/f9e79f/000000?text=TANG+2", markers: [{id:'p2', type:'display', top:'40%', left:'30%', title:'Trưng bày'}] },
-    3: { bg: "https://placehold.co/400x300/d7bde2/000000?text=TANG+3", markers: [{id:'p3', type:'display', top:'30%', left:'50%', title:'Không gian'}] }
+    1: { 
+        bg: "https://placehold.co/400x350/a2d9ce/000000?text=TANG+1+CO+VAT", 
+        markers: [
+            {id:'cur', type:'current', top:'70%', left:'50%', label:'Bạn'},
+            {id:'ceramic', type:'display', top:'40%', left:'30%', label:'Khu Gốm sứ'},
+            {id:'prehistoric', type:'display', top:'35%', left:'70%', label:'Đà Nẵng Tiền sử'},
+            {id:'archaeology', type:'display', top:'20%', left:'45%', label:'Khu Khảo cổ'},
+            {id:'wc1', type:'toilet', top:'10%', left:'85%', label:'WC'},
+            {id:'info1', type:'info', top:'75%', left:'20%', label:'Quầy Thông tin'}
+        ] 
+    },
+    2: { 
+        bg: "https://placehold.co/400x350/f9e79f/000000?text=TANG+2+KHANG+CHIEN", 
+        markers: [
+            {id:'cur', type:'current', top:'80%', left:'50%', label:'Bạn'},
+            {id:'french', type:'display', top:'30%', left:'25%', label:'Chống Pháp'},
+            {id:'american', type:'display', top:'50%', left:'65%', label:'Chống Mỹ'},
+            {id:'memories', type:'display', top:'75%', left:'30%', label:'Kỷ vật Kháng chiến'},
+            {id:'wc2', type:'toilet', top:'10%', left:'85%', label:'WC'}
+        ] 
+    },
+    3: { 
+        bg: "https://placehold.co/400x350/d7bde2/000000?text=TANG+3+VAN+HOA", 
+        markers: [
+            {id:'cur', type:'current', top:'85%', left:'50%', label:'Bạn'},
+            {id:'ethnic', type:'display', top:'40%', left:'40%', label:'Văn hóa Dân tộc'},
+            {id:'sea', type:'display', top:'60%', left:'75%', label:'Biển đảo'},
+            {id:'cafe', type:'info', top:'20%', left:'20%', label:'Cafe Sách'},
+            {id:'wc3', type:'toilet', top:'10%', left:'85%', label:'WC'}
+        ] 
+    }
 };
+
 let activeFilters = { display:true, toilet:true, info:true, current:true };
 
-function toggleFilter(t) { activeFilters[t] = !activeFilters[t]; document.getElementById(`filter-${t}`).classList.toggle('active'); changeFloor(); }
+function toggleFilter(t) { 
+    activeFilters[t] = !activeFilters[t]; 
+    document.getElementById(`filter-${t}`).classList.toggle('active'); 
+    changeFloor(); 
+}
 
 function changeFloor() {
   const f = document.getElementById('floor-select').value;
   const mc = document.getElementById('map-container');
+  const ds = document.getElementById('destination-select');
   if(!floorData[f]) return;
+  
+  // Update Background
   mc.style.backgroundImage = `url(${floorData[f].bg})`;
   mc.querySelectorAll('.map-marker').forEach(e => e.remove());
+  resetPath();
+
+  // Reset & Update Dropdown
+  ds.innerHTML = '<option value="" selected>Chọn điểm đến...</option>';
+
   floorData[f].markers.forEach(m => {
+      // Add to dropdown if not the "Current" marker
+      if(m.type !== 'current') {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.innerText = m.label;
+          ds.appendChild(opt);
+      }
+
+      // Filter Visibility
       if(!activeFilters[m.type]) return;
-      const el = document.createElement('div'); el.className = `map-marker marker-${m.type}`;
-      el.style.top = m.top; el.style.left = m.left; el.innerText = '📍';
+
+      // Add to Map
+      const el = document.createElement('div'); 
+      el.className = `map-marker marker-${m.type}`;
+      el.id = `map-marker-${m.id}`;
+      el.style.top = m.top; 
+      el.style.left = m.left;
+      el.innerHTML = m.type === 'current' ? '📍' : '🔵';
+      
+      const lbl = document.createElement('div');
+      lbl.className = 'marker-label';
+      lbl.innerText = m.label;
+      el.appendChild(lbl);
+
       mc.appendChild(el);
   });
 }
 
-function findPath() { console.log("Đang chỉ đường..."); }
-function resetMap() { changeFloor(); }
+function findPath() { 
+    const destId = document.getElementById('destination-select').value;
+    if(!destId) {
+        console.log("Vui lòng chọn điểm đến!");
+        return;
+    }
+
+    const floor = document.getElementById('floor-select').value;
+    const startM = floorData[floor].markers.find(m => m.type === 'current');
+    const endM = floorData[floor].markers.find(m => m.id === destId);
+
+    if(startM && endM) {
+        drawPath(startM, endM);
+        document.getElementById('ai-guide').innerText = `🤖 AI: Đã tìm lộ trình tới ${endM.label}. Hãy đi thẳng khoảng 10m.`;
+    }
+}
+
+function drawPath(start, end) {
+    const line = document.getElementById('path-line');
+    const container = document.getElementById('map-container');
+    
+    const x1 = parseFloat(start.left);
+    const y1 = parseFloat(start.top);
+    const x2 = parseFloat(end.left);
+    const y2 = parseFloat(end.top);
+    
+    // Convert % to px relative to container
+    const cw = container.offsetWidth;
+    const ch = container.offsetHeight;
+    
+    const px1 = (x1 / 100) * cw;
+    const py1 = (y1 / 100) * ch;
+    const px2 = (x2 / 100) * cw;
+    const py2 = (y2 / 100) * ch;
+    
+    const length = Math.sqrt(Math.pow(px2 - px1, 2) + Math.pow(py2 - py1, 2));
+    const angle = Math.atan2(py2 - py1, px2 - px1) * 180 / Math.PI;
+    
+    line.style.width = length + 'px';
+    line.style.left = px1 + 'px';
+    line.style.top = py1 + 'px';
+    line.style.transform = `rotate(${angle}deg)`;
+    line.style.display = 'block';
+}
+
+function resetPath() {
+    document.getElementById('path-line').style.display = 'none';
+}
+
+function resetMap() { 
+    document.getElementById('destination-select').value = "";
+    document.getElementById('ai-guide').innerText = "🤖 Gợi ý: Chào mừng bạn quay lại bản đồ chính.";
+    changeFloor(); 
+}
 
 document.addEventListener('DOMContentLoaded', () => { 
     setTimeout(changeFloor, 100); 
