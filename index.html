@@ -35,22 +35,22 @@ body {
 
 .phone {
   position: relative;
-  width: 390px;
-  height: 780px;
-  border: 8px solid var(--text-dark);
-  border-radius: 48px;
+  width: 100%; /* Chuyển sang full màn hình */
+  height: 100vh; /* Chuyển sang full màn hình */
+  border: none; /* Bỏ viền điện thoại */
+  border-radius: 0; /* Bỏ bo góc điện thoại */
   background: #000;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  box-shadow: none; /* Bỏ đổ bóng giả lập */
 }
 
 .screen {
   background: var(--bg-light);
   width: 100%;
   height: 100%;
-  border-radius: 40px; 
+  border-radius: 0; /* Bỏ bo góc màn hình con */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -118,7 +118,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
   align-items: center;
   background: var(--bg-card);
   padding: 10px 0;
-  border-radius: 0 0 40px 40px; 
+  border-radius: 0; /* Bỏ bo góc thanh điều hướng */
   width: 100%;
   box-shadow: 0 -5px 20px rgba(0,0,0,0.1); 
   border-top: 1px solid #eee;
@@ -592,7 +592,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
   <div class="screen hidden" id="main-screen">
     <input type="text" id="search-input" placeholder="🔍 Tìm khu trưng bày, hiện vật..." style="width:95%; margin:5px 0 10px; padding:10px; border-radius:12px; border:1px solid #ccc;">
 
-    <!-- NÂNG CẤP PHẦN GIỚI THIỆU TÍNH NĂNG APP -->
+    <!-- TAB GIỚI THIỆU -->
     <div class="tab-content active-tab" id="intro-tab">
       <h3>🏛️ Khám phá Ứng dụng</h3>
       <div class="info-card">
@@ -613,7 +613,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
       </div>
     </div>
 
-    <!-- Chatbot Tab (Content kept for structure, but redirect handled by nav) -->
+    <!-- Chatbot Tab -->
     <div class="tab-content" id="chat-tab">
       <h3>💬 Chatbot AI (Gemini)</h3>
       <div id="kb-status" style="font-size: 11px; color: var(--primary-dark); margin-bottom: 5px;">✅ Đã kết nối trí tuệ nhân tạo thời gian thực.</div>
@@ -799,7 +799,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary-color); box
 /* ==========================================================================
    CONFIG & API
    ========================================================================== */
-const apiKey = ""; // Được cung cấp bởi môi trường runtime
+const apiKey = ""; // Sẽ được tự động điền bởi môi trường Canvas
 
 /* ==========================================================================
    DỮ LIỆU CÁ NHÂN
@@ -836,9 +836,6 @@ function saveProfile() {
         profileData.username = newUsername;
         updateProfileDisplay();
         toggleEditProfile(); 
-        console.log("Đã lưu Hồ sơ thành công!");
-    } else {
-        console.log("Tên không được để trống!");
     }
 }
 
@@ -876,7 +873,7 @@ const tranHungDaoQuizData = [
         ]
     },
     {
-        question: "3. Ông nổi tiếng with chiến thắng nào trước quân Nguyên?",
+        question: "3. Ông nổi tiếng với chiến thắng nào trước quân Nguyên?",
         options: [
             { text: "Chiến thắng Rạch Gầm – Xoài Mút", isCorrect: false, answer: "Đây là của Nguyễn Huệ." },
             { text: "Chiến thắng Chi Lăng", isCorrect: false, answer: "Đây là của Lê Lợi." },
@@ -960,7 +957,6 @@ function getQuizForArtifact(artifactId) {
 }
 
 // --- PROFILE / QUIZ LOGIC ---
-
 function showProfileSubScreen(viewId) {
     document.getElementById('profile-main-view').style.display = 'none';
     document.getElementById('artifact-history-quiz-view').style.display = 'none';
@@ -1031,14 +1027,7 @@ function renderProfile() {
 }
 
 function handleStartQuiz() {
-    if (!currentArtifactData || !getQuizForArtifact(currentArtifactData.id)) {
-        console.log("Không có Quiz cho hiện vật này.");
-        return;
-    }
-    const status = artifactQuizStatus[currentArtifactData.id];
-    if (status && status.done) {
-        console.log("📝 Bạn đã hoàn thành bài thi này.");
-    }
+    if (!currentArtifactData || !getQuizForArtifact(currentArtifactData.id)) return;
     document.getElementById('main-screen').classList.add('hidden');
     document.getElementById('quiz-standalone-screen').classList.remove('hidden');
     startArtifactQuiz(currentArtifactData, 'standalone');
@@ -1070,11 +1059,6 @@ function startArtifactQuiz(artifactData, mode = 'standalone') {
         newQuizFeedback.innerText = `Kết quả: ${quizStatus.score}/${quizData.length} điểm đúng!`;
         newQuizFeedback.style.display = 'block';
         renderQuizQuestionsQR(quizData, newQuizContainer, false, quizStatus.selections, mode);
-        
-        const lockMsg = document.createElement('p');
-        lockMsg.style.textAlign = 'center'; lockMsg.style.marginTop = '15px'; lockMsg.style.color = '#7f8c8d'; lockMsg.style.fontSize = '12px';
-        lockMsg.innerText = '🔒 Bài thi đã hoàn thành và xem lời giải. Không thể thực hiện lại.';
-        quizContent.appendChild(lockMsg);
     } else {
         newQuizSubmitBtn.style.display = 'inline-block';
         renderQuizQuestionsQR(quizData, newQuizContainer, true, {}, mode);
@@ -1126,10 +1110,7 @@ function selectQuizOptionQR(button, qIndex, optIndex, prefix) {
 
 function submitArtifactQuiz(mode) {
     const finalData = currentArtifactQuizData;
-    if (!finalData || !finalData.every(q => q.selectedOptionIndex !== null && q.selectedOptionIndex !== undefined)) {
-         console.log("Vui lòng trả lời hết các câu hỏi!");
-         return;
-    }
+    if (!finalData || !finalData.every(q => q.selectedOptionIndex !== null && q.selectedOptionIndex !== undefined)) return;
     let correctCount = 0;
     let selections = {};
     finalData.forEach((q, index) => {
@@ -1139,7 +1120,6 @@ function submitArtifactQuiz(mode) {
     artifactQuizStatus[currentArtifactData.id] = { done: true, score: correctCount, total: finalData.length, selections: selections };
     renderProfileMain(); 
     startArtifactQuiz(currentArtifactData, mode); 
-    console.log(correctCount === finalData.length ? "🎉 Tuyệt vời! Bạn đã đạt điểm tối đa." : `Bạn đúng ${correctCount}/${finalData.length} câu.`);
 }
 
 function checkRewardStatus() {
@@ -1186,7 +1166,7 @@ function checkRewardStatus() {
 }
 
 /* ==========================================================================
-   AI CHATBOT (GEMINI UPGRADED WITH STABILITY)
+   AI CHATBOT (GEMINI)
    ========================================================================== */
 let isProcessing = false; 
 
@@ -1207,7 +1187,6 @@ async function sendMessage() {
     const loader = document.getElementById('loader');
     loader.style.display = 'block';
 
-    // Thêm tin nhắn của người dùng vào giao diện
     const userDiv = document.createElement('div');
     userDiv.className = 'chat-message user-msg'; 
     userDiv.innerText = msg;
@@ -1221,15 +1200,9 @@ async function sendMessage() {
 Thông tin quan trọng về bảo tàng:
 - Địa chỉ: 24 Trần Phú, Thạch Thang, Hải Châu, Đà Nẵng.
 - Giờ mở cửa: 07:30 – 17:00 hàng ngày.
-- Giá vé: 40.000đ cho người lớn, 20.000đ cho học sinh/sinh viên. Trẻ em dưới 6 tuổi miễn phí.
-- Sơ đồ trưng bày:
-  + Tầng 1: Đà Nẵng từ thời tiền sử đến nay, gốm sứ cổ, không gian văn hóa khảo cổ.
-  + Tầng 2: Đà Nẵng trong hai cuộc kháng chiến chống Pháp và chống Mỹ.
-  + Tầng 3: Văn hóa các dân tộc ở Đà Nẵng và Quảng Nam (đặc biệt là dân tộc Cơ Tu), văn hóa biển đảo.
-- Hiện vật tiêu biểu: Tượng Trần Hưng Đạo, Gốm cổ, các kỷ vật kháng chiến.
-Nếu khách hỏi ngoài phạm vi Bảo tàng Đà Nẵng, hãy trả lời khéo léo và hướng họ về thông tin bảo tàng.`;
+- Giá vé: 40.000đ người lớn, 20.000đ học sinh/sinh viên.
+- Sơ đồ trưng bày: Tầng 1 (Lịch sử, Gốm sứ), Tầng 2 (Kháng chiến), Tầng 3 (Văn hóa, Biển đảo).`;
 
-        // NÂNG CẤP: Cơ chế Retry với Exponential Backoff để tăng độ ổn định
         let responseData;
         let delay = 1000;
         for (let i = 0; i < 5; i++) {
@@ -1253,7 +1226,6 @@ Nếu khách hỏi ngoài phạm vi Bảo tàng Đà Nẵng, hãy trả lời kh
 
         const aiResponse = responseData?.candidates?.[0]?.content?.parts?.[0]?.text || "Xin lỗi, tôi đang gặp chút sự cố kết nối AI. Bạn hãy thử nhắn lại một lần nữa nhé!";
 
-        // Thêm tin nhắn của AI vào giao diện
         const aiDiv = document.createElement('div');
         aiDiv.className = 'chat-message ai-msg'; 
         aiDiv.innerText = aiResponse; 
@@ -1262,7 +1234,7 @@ Nếu khách hỏi ngoài phạm vi Bảo tàng Đà Nẵng, hãy trả lời kh
     } catch (error) {
         const errDiv = document.createElement('div');
         errDiv.className = 'chat-message ai-msg'; 
-        errDiv.innerText = "Không thể kết nối với máy chủ AI. Vui lòng kiểm tra lại mạng."; 
+        errDiv.innerText = "Không thể kết nối với máy chủ AI."; 
         chatWindow.appendChild(errDiv);
         chatWindow.appendChild(document.createElement('div')).style.clear = 'both'; 
     } finally {
@@ -1299,11 +1271,6 @@ function showTab(tabId) {
   document.getElementById('quiz-standalone-screen').classList.add('hidden');
   
   if (tabId === 'qr-tab') {
-      updateMockButtons(currentArtifactData?.id);
-      exitSubView(); 
-      if (!currentArtifactData) {
-          document.getElementById('mock-artifact-buttons').style.display = 'none';
-      }
       startCamera();
   }
 
@@ -1312,9 +1279,6 @@ function showTab(tabId) {
   }
 }
 
-/**
- * Nâng cấp tính năng Chatbot: Mở liên kết Gemini ngoài
- */
 function openGemini() {
     stopCamera();
     window.open('https://gemini.google.com/app?hl=vi', '_blank');
@@ -1323,12 +1287,9 @@ function openGemini() {
 function toggleLoginScanner(show) {
     const formCard = document.getElementById('login-form-card');
     const scannerCard = document.getElementById('login-scanner-card');
-    const errorMsg = document.getElementById('login-error-msg');
-    
     if (show) {
         formCard.classList.add('hidden');
         scannerCard.classList.remove('hidden');
-        errorMsg.style.display = 'none';
         startLoginCamera();
     } else {
         stopLoginCamera();
@@ -1342,43 +1303,29 @@ async function startLoginCamera() {
     const video = document.getElementById('login-camera-preview');
     const canvas = document.getElementById('login-camera-canvas');
     const context = canvas.getContext('2d');
-    
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
         loginStream = stream;
         video.srcObject = stream;
-        
         loginInterval = setInterval(() => {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth; canvas.height = video.videoHeight;
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const code = jsQR(context.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height);
-                if (code) {
-                    if (code.data.trim() === 'DNMnhom7') {
-                        stopLoginCamera();
-                        document.getElementById('ticket-input').value = 'DNMnhom7';
-                        goToMain();
-                    } else {
-                        console.log("Mã QR không hợp lệ cho đăng nhập.");
-                    }
+                if (code && code.data.trim() === 'DNMnhom7') {
+                    stopLoginCamera();
+                    document.getElementById('ticket-input').value = 'DNMnhom7';
+                    goToMain();
                 }
             }
         }, 150);
-    } catch (err) {
-        console.error("Không thể mở camera đăng nhập:", err);
-        toggleLoginScanner(false);
-    }
+    } catch (err) { toggleLoginScanner(false); }
 }
 
 function stopLoginCamera() {
     if (loginInterval) clearInterval(loginInterval);
     if (loginStream) loginStream.getTracks().forEach(t => t.stop());
     loginStream = null;
-}
-
-function quickScan() {
-    toggleLoginScanner(true);
 }
 
 function goToLogin() { document.getElementById('wifi-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); }
@@ -1431,11 +1378,6 @@ function stopCamera() {
   document.getElementById('camera-placeholder').style.display = 'flex';
 }
 
-function updateMockButtons(id) {
-    document.getElementById('mock-scan-1').style.display = id === 'artifact_123' ? 'none' : 'block';
-    document.getElementById('mock-scan-2').style.display = id === 'artifact_456' ? 'none' : 'block';
-}
-
 function mockScanArtifact1() { processMockScan(mockArtifactData); }
 function mockScanArtifact2() { processMockScan(mockArtifactData2); }
 
@@ -1449,27 +1391,19 @@ function handleScanSuccess(json) {
   try {
       const data = JSON.parse(json);
       currentArtifactData = data;
-      
       exitSubView();
       stopCamera(); 
-      
       document.getElementById('data-title').innerText = `Hiện vật: ${data.name}`;
       document.getElementById('scanned-details').innerHTML = `<p>Vị trí: Tầng ${data.floor} - ${data.pos}</p>`;
       document.getElementById('youtube-button').style.display = data.youtubeUrl ? 'inline-block' : 'none';
       document.getElementById('view360-button').style.display = 'inline-block';
       document.getElementById('start-quiz-button-qr').style.display = getQuizForArtifact(data.id) ? 'inline-block' : 'none';
       document.getElementById('qr-result').style.display = 'flex';
-      
       document.getElementById('mock-artifact-buttons').style.display = 'block';
-      updateMockButtons(data.id);
-  } catch(e) { console.log("QR không hợp lệ"); }
+  } catch(e) {}
 }
 
-function playVideoPresentation() { 
-    if(currentArtifactData?.youtubeUrl) {
-        window.open(currentArtifactData.youtubeUrl, '_blank');
-    }
-}
+function playVideoPresentation() { if(currentArtifactData?.youtubeUrl) window.open(currentArtifactData.youtubeUrl, '_blank'); }
 
 function view360() { 
     document.getElementById('data-title').style.display = 'none';
@@ -1477,18 +1411,10 @@ function view360() {
     document.getElementById('interaction-buttons').style.display = 'none';
     document.getElementById('start-quiz-button-qr').style.display = 'none';
     document.getElementById('mock-artifact-buttons').style.display = 'none'; 
-
     const d = document.getElementById('artifact-360-display');
     d.style.display = 'block';
-    
     const model = currentArtifactData?.id === 'artifact_456' ? 'Earth.glb' : 'Astronaut.glb';
-    
-    d.innerHTML = `
-        <div style="position: absolute; top: 15px; left: 15px; z-index: 50;">
-            <button onclick="exitSubView()" style="background: rgba(0,0,0,0.6); color: white; padding: 10px 20px; border-radius: 10px; font-size: 14px; box-shadow: none;">⬅️ Quay lại thông tin</button>
-        </div>
-        <model-viewer src="https://modelviewer.dev/shared-assets/models/${model}" auto-rotate camera-controls style="width: 100%; height: 100%;" ar></model-viewer>
-    `;
+    d.innerHTML = `<div style="position: absolute; top: 15px; left: 15px; z-index: 50;"><button onclick="exitSubView()" style="background: rgba(0,0,0,0.6); color: white; padding: 10px 20px; border-radius: 10px; font-size: 14px;">⬅️ Quay lại</button></div><model-viewer src="https://modelviewer.dev/shared-assets/models/${model}" auto-rotate camera-controls style="width: 100%; height: 100%;" ar></model-viewer>`;
 }
 
 function exitSubView() {
@@ -1496,7 +1422,6 @@ function exitSubView() {
     document.getElementById('scanned-details').style.display = 'block';
     document.getElementById('interaction-buttons').style.display = 'flex';
     document.getElementById('artifact-360-display').style.display = 'none';
-    
     if (currentArtifactData) {
         document.getElementById('start-quiz-button-qr').style.display = getQuizForArtifact(currentArtifactData.id) ? 'inline-block' : 'none';
         document.getElementById('mock-artifact-buttons').style.display = 'block'; 
@@ -1504,153 +1429,54 @@ function exitSubView() {
 }
 
 /* ==========================================================================
-   UPGRADED MAP LOGIC
+   MAP LOGIC
    ========================================================================== */
 const floorData = {
-    1: { 
-        bg: "https://placehold.co/400x350/a2d9ce/000000?text=TANG+1+CO+VAT", 
-        markers: [
-            {id:'cur', type:'current', top:'70%', left:'50%', label:'Bạn'},
-            {id:'ceramic', type:'display', top:'40%', left:'30%', label:'Khu Gốm sứ'},
-            {id:'prehistoric', type:'display', top:'35%', left:'70%', label:'Đà Nẵng Tiền sử'},
-            {id:'archaeology', type:'display', top:'20%', left:'45%', label:'Khu Khảo cổ'},
-            {id:'wc1', type:'toilet', top:'10%', left:'85%', label:'WC'},
-            {id:'info1', type:'info', top:'75%', left:'20%', label:'Quầy Thông tin'}
-        ] 
-    },
-    2: { 
-        bg: "https://placehold.co/400x350/f9e79f/000000?text=TANG+2+KHANG+CHIEN", 
-        markers: [
-            {id:'cur', type:'current', top:'80%', left:'50%', label:'Bạn'},
-            {id:'french', type:'display', top:'30%', left:'25%', label:'Chống Pháp'},
-            {id:'american', type:'display', top:'50%', left:'65%', label:'Chống Mỹ'},
-            {id:'memories', type:'display', top:'75%', left:'30%', label:'Kỷ vật Kháng chiến'},
-            {id:'wc2', type:'toilet', top:'10%', left:'85%', label:'WC'}
-        ] 
-    },
-    3: { 
-        bg: "https://placehold.co/400x350/d7bde2/000000?text=TANG+3+VAN+HOA", 
-        markers: [
-            {id:'cur', type:'current', top:'85%', left:'50%', label:'Bạn'},
-            {id:'ethnic', type:'display', top:'40%', left:'40%', label:'Văn hóa Dân tộc'},
-            {id:'sea', type:'display', top:'60%', left:'75%', label:'Biển đảo'},
-            {id:'cafe', type:'info', top:'20%', left:'20%', label:'Cafe Sách'},
-            {id:'wc3', type:'toilet', top:'10%', left:'85%', label:'WC'}
-        ] 
-    }
+    1: { bg: "https://placehold.co/400x350/a2d9ce/000000?text=TANG+1", markers: [{id:'cur', type:'current', top:'70%', left:'50%', label:'Bạn'}, {id:'ceramic', type:'display', top:'40%', left:'30%', label:'Gốm sứ'}] },
+    2: { bg: "https://placehold.co/400x350/f9e79f/000000?text=TANG+2", markers: [{id:'cur', type:'current', top:'80%', left:'50%', label:'Bạn'}, {id:'french', type:'display', top:'30%', left:'25%', label:'Chống Pháp'}] },
+    3: { bg: "https://placehold.co/400x350/d7bde2/000000?text=TANG+3", markers: [{id:'cur', type:'current', top:'85%', left:'50%', label:'Bạn'}, {id:'ethnic', type:'display', top:'40%', left:'40%', label:'Văn hóa'}] }
 };
-
-let activeFilters = { display:true, toilet:true, info:true, current:true };
-
-function toggleFilter(t) { 
-    activeFilters[t] = !activeFilters[t]; 
-    document.getElementById(`filter-${t}`).classList.toggle('active'); 
-    changeFloor(); 
-}
 
 function changeFloor() {
   const f = document.getElementById('floor-select').value;
   const mc = document.getElementById('map-container');
   const ds = document.getElementById('destination-select');
   if(!floorData[f]) return;
-  
-  // Update Background
   mc.style.backgroundImage = `url(${floorData[f].bg})`;
   mc.querySelectorAll('.map-marker').forEach(e => e.remove());
-  resetPath();
-
-  // Reset & Update Dropdown
   ds.innerHTML = '<option value="" selected>Chọn điểm đến...</option>';
-
   floorData[f].markers.forEach(m => {
-      // Add to dropdown if not the "Current" marker
       if(m.type !== 'current') {
-          const opt = document.createElement('option');
-          opt.value = m.id;
-          opt.innerText = m.label;
-          ds.appendChild(opt);
+          const opt = document.createElement('option'); opt.value = m.id; opt.innerText = m.label; ds.appendChild(opt);
       }
-
-      // Filter Visibility
-      if(!activeFilters[m.type]) return;
-
-      // Add to Map
-      const el = document.createElement('div'); 
-      el.className = `map-marker marker-${m.type}`;
-      el.id = `map-marker-${m.id}`;
-      el.style.top = m.top; 
-      el.style.left = m.left;
-      el.innerHTML = m.type === 'current' ? '📍' : '🔵';
-      
-      const lbl = document.createElement('div');
-      lbl.className = 'marker-label';
-      lbl.innerText = m.label;
-      el.appendChild(lbl);
-
+      const el = document.createElement('div'); el.className = `map-marker marker-${m.type}`; el.style.top = m.top; el.style.left = m.left; el.innerHTML = m.type === 'current' ? '📍' : '🔵';
+      const lbl = document.createElement('div'); lbl.className = 'marker-label'; lbl.innerText = m.label; el.appendChild(lbl);
       mc.appendChild(el);
   });
 }
 
 function findPath() { 
     const destId = document.getElementById('destination-select').value;
-    if(!destId) {
-        console.log("Vui lòng chọn điểm đến!");
-        return;
-    }
-
     const floor = document.getElementById('floor-select').value;
     const startM = floorData[floor].markers.find(m => m.type === 'current');
     const endM = floorData[floor].markers.find(m => m.id === destId);
-
-    if(startM && endM) {
-        drawPath(startM, endM);
-        document.getElementById('ai-guide').innerText = `🤖 AI: Đã tìm lộ trình tới ${endM.label}. Hãy đi thẳng khoảng 10m.`;
-    }
+    if(startM && endM) drawPath(startM, endM);
 }
 
 function drawPath(start, end) {
     const line = document.getElementById('path-line');
     const container = document.getElementById('map-container');
-    
-    const x1 = parseFloat(start.left);
-    const y1 = parseFloat(start.top);
-    const x2 = parseFloat(end.left);
-    const y2 = parseFloat(end.top);
-    
-    // Convert % to px relative to container
-    const cw = container.offsetWidth;
-    const ch = container.offsetHeight;
-    
-    const px1 = (x1 / 100) * cw;
-    const py1 = (y1 / 100) * ch;
-    const px2 = (x2 / 100) * cw;
-    const py2 = (y2 / 100) * ch;
-    
-    const length = Math.sqrt(Math.pow(px2 - px1, 2) + Math.pow(py2 - py1, 2));
-    const angle = Math.atan2(py2 - py1, px2 - px1) * 180 / Math.PI;
-    
-    line.style.width = length + 'px';
-    line.style.left = px1 + 'px';
-    line.style.top = py1 + 'px';
-    line.style.transform = `rotate(${angle}deg)`;
-    line.style.display = 'block';
+    const cw = container.offsetWidth, ch = container.offsetHeight;
+    const px1 = (parseFloat(start.left)/100)*cw, py1 = (parseFloat(start.top)/100)*ch;
+    const px2 = (parseFloat(end.left)/100)*cw, py2 = (parseFloat(end.top)/100)*ch;
+    const length = Math.sqrt(Math.pow(px2-px1, 2)+Math.pow(py2-py1, 2));
+    const angle = Math.atan2(py2-py1, px2-px1)*180/Math.PI;
+    line.style.width = length+'px'; line.style.left = px1+'px'; line.style.top = py1+'px'; line.style.transform = `rotate(${angle}deg)`; line.style.display = 'block';
 }
 
-function resetPath() {
-    document.getElementById('path-line').style.display = 'none';
-}
+function resetMap() { document.getElementById('destination-select').value = ""; changeFloor(); }
 
-function resetMap() { 
-    document.getElementById('destination-select').value = "";
-    document.getElementById('ai-guide').innerText = "🤖 Gợi ý: Chào mừng bạn quay lại bản đồ chính.";
-    changeFloor(); 
-}
-
-document.addEventListener('DOMContentLoaded', () => { 
-    setTimeout(changeFloor, 100); 
-    renderProfile(); 
-    updateProfileDisplay(); 
-});
+document.addEventListener('DOMContentLoaded', () => { setTimeout(changeFloor, 100); renderProfile(); });
 function selectLang(l) { document.getElementById('lang-display').innerText = l==='vi'?'🌐 VI':'🌐 EN'; document.getElementById('lang-options').style.display='none'; }
 function toggleLangOptions() { const o=document.getElementById('lang-options'); o.style.display=o.style.display==='flex'?'none':'flex'; }
 </script>
